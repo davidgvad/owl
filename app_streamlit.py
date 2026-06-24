@@ -511,7 +511,8 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
               <div class="subtitle">Press Start. The robot moves through the pipe and logs events as it reaches them.</div>
             </div>
             <div class="controls">
-              <button id="startBtn" class="primary">${{state.playing ? "Pause" : "Start"}}</button>
+              <button id="startBtn" class="primary">Start</button>
+              <button id="pauseBtn">Pause</button>
               <button id="resetBtn">Reset</button>
               <label>
                 Speed
@@ -571,7 +572,8 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         </div>
       `;
 
-      document.getElementById("startBtn").onclick = togglePlay;
+      document.getElementById("startBtn").onclick = start;
+      document.getElementById("pauseBtn").onclick = pause;
       document.getElementById("resetBtn").onclick = reset;
       document.getElementById("speedRange").oninput = (event) => {{
         state.speed = Number(event.target.value);
@@ -582,26 +584,36 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
       if (!state.playing) return;
       state.index = clamp(state.index + Math.max(1, Math.round(state.speed * 2)), 0, mission.states.length - 1);
       if (state.index >= mission.states.length - 1) {{
-        state.playing = false;
+        pause();
+        return;
       }}
       render();
     }}
 
-    function togglePlay() {{
-      state.playing = !state.playing;
-      if (state.playing && !state.timer) {{
+    function start() {{
+      if (state.playing) return;
+      state.playing = true;
+      if (!state.timer) {{
         state.timer = setInterval(step, 120);
       }}
       render();
     }}
 
-    function reset() {{
+    function pause() {{
       state.playing = false;
+      if (state.timer) {{
+        clearInterval(state.timer);
+        state.timer = null;
+      }}
+      render();
+    }}
+
+    function reset() {{
+      pause();
       state.index = 0;
       render();
     }}
 
-    state.timer = setInterval(step, 120);
     render();
     </script>
     """
