@@ -8,7 +8,7 @@ if [ ! -x ".venv/bin/python" ]; then
   python3 -m venv .venv
 fi
 
-if ! .venv/bin/python -c "import streamlit, pandas, plotly" >/dev/null 2>&1; then
+if ! .venv/bin/python -c "import streamlit, pandas" >/dev/null 2>&1; then
   echo "Installing local dashboard dependencies..."
   .venv/bin/python -m pip install -r requirements.txt
 fi

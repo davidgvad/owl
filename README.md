@@ -22,6 +22,8 @@ Then open:
 http://127.0.0.1:8501
 ```
 
+Press **Start** in the page to run the pipe robot simulation. The robot moves through the pipe network, and the right-side data panel updates when it reaches intersections, a bump/tether tug, and the leak-signal area.
+
 The honest MVP story is:
 
 > Our robot will produce hydrophone, IMU, tether/reel, and pipe metadata logs. Before the hardware is ready, this repo builds the analysis layer using a canonical mission format, trusted public proxy datasets, and synthetic mission generation.
