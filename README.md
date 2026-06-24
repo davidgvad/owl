@@ -2,6 +2,26 @@
 
 PipeOwl is a mission replay and analytics framework for a water-pipe inspection sonde.
 
+## Run Locally
+
+No deployment is needed. Start the local dashboard with:
+
+```sh
+./run_local.sh
+```
+
+Or:
+
+```sh
+make run
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8501
+```
+
 The honest MVP story is:
 
 > Our robot will produce hydrophone, IMU, tether/reel, and pipe metadata logs. Before the hardware is ready, this repo builds the analysis layer using a canonical mission format, trusted public proxy datasets, and synthetic mission generation.
