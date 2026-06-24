@@ -1,0 +1,191 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MAIN_A",
+        "kind": "pipe",
+        "diameter_mm": 100,
+        "material": "PVC",
+        "length_m": 30.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MAIN_B",
+        "kind": "pipe",
+        "diameter_mm": 100,
+        "material": "PVC",
+        "length_m": 17.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            30.0,
+            0.0
+          ],
+          [
+            45.0,
+            8.0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MAIN_C",
+        "kind": "pipe",
+        "diameter_mm": 100,
+        "material": "PVC",
+        "length_m": 17.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            45.0,
+            8.0
+          ],
+          [
+            62.0,
+            8.0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BRANCH_NORTH",
+        "kind": "pipe",
+        "diameter_mm": 75,
+        "material": "PVC",
+        "length_m": 8.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.0,
+            0.0
+          ],
+          [
+            15.0,
+            8.0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SERVICE_SOUTH",
+        "kind": "pipe",
+        "diameter_mm": 75,
+        "material": "PVC",
+        "length_m": 10.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            30.0,
+            0.0
+          ],
+          [
+            30.0,
+            -10.0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BYPASS",
+        "kind": "pipe",
+        "diameter_mm": 75,
+        "material": "PVC",
+        "length_m": 7.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            45.0,
+            8.0
+          ],
+          [
+            45.0,
+            15.0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "J001",
+        "kind": "intersection",
+        "distance_m": 15.0,
+        "degree": 3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "J002",
+        "kind": "intersection",
+        "distance_m": 30.0,
+        "degree": 3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "J003",
+        "kind": "intersection",
+        "distance_m": 47.0,
+        "degree": 3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          45.0,
+          8.0
+        ]
+      }
+    }
+  ]
+}
