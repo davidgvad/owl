@@ -18,7 +18,7 @@ except ModuleNotFoundError as exc:  # pragma: no cover - exercised by users with
     ) from exc
 
 
-MISSION_DIR = Path("data/demo_mission")
+MISSION_DIR = Path("data/calibrated_mission")
 
 
 @st.cache_data
@@ -507,8 +507,8 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         <div class="sim-shell">
           <div class="topbar">
             <div>
-              <div class="title">Pipe robot simulation</div>
-              <div class="subtitle">Press Start. The robot moves through the pipe and logs events as it reaches them.</div>
+              <div class="title">Dataset-calibrated mission replay</div>
+              <div class="subtitle">Press Start. The robot moves through the pipe and explains each detected pattern.</div>
             </div>
             <div class="controls">
               <button id="startBtn" class="primary">Start</button>
@@ -620,7 +620,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
 
 
 def main() -> None:
-    st.set_page_config(page_title="PipeOwl Simulation", layout="wide")
+    st.set_page_config(page_title="PipeOwl Dataset-Calibrated Replay", layout="wide")
     st.markdown(
         """
         <style>
@@ -642,9 +642,9 @@ def main() -> None:
     )
 
     if not MISSION_DIR.exists():
-        from pipeowl import build_demo_mission
+        from pipeowl import build_calibrated_mission
 
-        build_demo_mission(MISSION_DIR)
+        build_calibrated_mission(MISSION_DIR)
 
     network = load_json(str(mission_path("network.geojson")))
     robot_state = load_csv(str(mission_path("robot_state.csv")))
@@ -652,9 +652,9 @@ def main() -> None:
     acoustic = load_csv(str(mission_path("acoustic_features.csv")))
     events = load_csv(str(mission_path("events.csv")))
 
-    st.title("PipeOwl pipe robot simulation")
+    st.title("PipeOwl dataset-calibrated pipe robot replay")
     st.markdown(
-        '<div class="intro">A simple local simulation: start the robot, watch it travel through the pipe network, and see events appear in the data panel.</div>',
+        '<div class="intro">Start the robot. Sensor patterns are calibrated from public underwater robot and acoustic datasets, then fused with a modeled pipe network.</div>',
         unsafe_allow_html=True,
     )
 

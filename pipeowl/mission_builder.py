@@ -1,4 +1,4 @@
-"""Synthetic PipeOwl mission generation."""
+"""Dataset-calibrated PipeOwl mission replay generation."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 from .features import add_imu_features, extract_acoustic_features, interpolate_distance
+from .calibration_profiles import CALIBRATION_SOURCES, PATTERN_LIBRARY
 from .schemas import REQUIRED_COLUMNS, write_csv
 
 Point = Tuple[float, float]
@@ -75,19 +76,23 @@ def distance_to_time(distance_m: float, speed_mps: float = 0.70) -> float:
 
 def write_metadata(out_dir: Path) -> None:
     metadata = {
-        "mission_id": "demo_001",
-        "mission_name": "PipeOwl Mission Replay Sample",
-        "data_sources": [
-            "PipeOwl synthetic route",
-            "GPLA-12 style acoustic leakage proxy",
-            "OceanShip style hydrophone background proxy",
-            "SubPipe style IMU/navigation proxy",
-            "WNTR/EPANET style synthetic pipe graph",
-        ],
+        "mission_id": "calibrated_001",
+        "mission_name": "PipeOwl Dataset-Calibrated Replay",
+        "replay_mode": "dataset_calibrated",
+        "data_sources": [source["source"] for source in CALIBRATION_SOURCES],
+        "calibration_sources": CALIBRATION_SOURCES,
+        "pattern_library": PATTERN_LIBRARY,
         "provenance_note": (
-            "This is proxy plus synthetic mission replay data, not real PipeOwl "
-            "in-pipe robot data. It matches the log format expected from the MVP sonde."
+            "Dataset-calibrated replay: motion, IMU, hydrophone, pressure, and flow "
+            "behavior are calibrated from public underwater robot and acoustic datasets. "
+            "Pipe geometry, tether, and event placement are modeled until PipeOwl hardware "
+            "test-loop logs replace each stream."
         ),
+        "mode_limitations": [
+            "Not collected by a PipeOwl robot yet",
+            "No public dataset currently contains in-pipe hydrophone, IMU, tether, and leak truth together",
+            "Intersections are identified by map/IMU fusion, not hydrophone frequency alone",
+        ],
         "pipe": {
             "material": "PVC",
             "diameter_mm": 100,
@@ -99,9 +104,9 @@ def write_metadata(out_dir: Path) -> None:
             "sensors": ["hydrophone", "imu", "reel_encoder", "tether_tension"],
         },
         "truth": {
-            "synthetic_leak_distance_m": LEAK_DISTANCE_M,
-            "synthetic_impact_distance_m": IMPACT_DISTANCE_M,
-            "known_intersections_m": [15.0, 30.0, 47.0],
+            "modeled_leak_distance_m": LEAK_DISTANCE_M,
+            "modeled_impact_distance_m": IMPACT_DISTANCE_M,
+            "mapped_intersections_m": [15.0, 30.0, 47.0],
         },
     }
     with (out_dir / "metadata.json").open("w", encoding="utf-8") as handle:
@@ -343,7 +348,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
             distance_m,
             0.95,
             "network_geometry",
-            "Known branch node from synthetic pipe graph",
+            f"{PATTERN_LIBRARY['intersection']['evidence']}. Source: {PATTERN_LIBRARY['intersection']['source']}",
         )
 
     impact_time = distance_to_time(IMPACT_DISTANCE_M)
@@ -353,8 +358,8 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         impact_time,
         IMPACT_DISTANCE_M,
         0.78,
-        "imu_reel",
-        "Acceleration spike and tether tension rise",
+        "imu_reel_fusion",
+        f"{PATTERN_LIBRARY['impact']['evidence']}. Source: {PATTERN_LIBRARY['impact']['source']}",
     )
 
     leak_candidates = sorted(
@@ -381,8 +386,8 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                 start_s,
                 float(best["distance_m"]),
                 confidence,
-                "hydrophone_fusion",
-                "High acoustic leak score without impact or tether artifact",
+                "hydrophone_hydraulic_fusion",
+                f"{PATTERN_LIBRARY['leak']['evidence']}. Source: {PATTERN_LIBRARY['leak']['source']}",
             )
             break
 
@@ -393,8 +398,8 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         distance_to_time(bend_distance),
         bend_distance,
         0.67,
-        "imu",
-        "Gyro spike aligned with heading change",
+        "imu_network_fusion",
+        f"{PATTERN_LIBRARY['intersection']['imu']}. Source: {PATTERN_LIBRARY['intersection']['source']}",
     )
 
     return sorted(events, key=lambda row: float(row["time_s"]))
@@ -416,7 +421,7 @@ def format_rows(rows: Sequence[Mapping[str, object]]) -> List[Dict[str, object]]
     return formatted
 
 
-def build_demo_mission(out_dir: Path) -> None:
+def build_calibrated_mission(out_dir: Path) -> None:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 

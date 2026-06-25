@@ -18,7 +18,7 @@ mission_001/
 
 ### metadata.json
 
-Stores mission identity, data provenance, pipe metadata, sonde metadata, and optional synthetic truth.
+Stores mission identity, data provenance, pipe metadata, sonde metadata, calibration sources, and optional modeled truth.
 
 Required top-level keys:
 
@@ -29,7 +29,7 @@ Required top-level keys:
 
 ### network.geojson
 
-GeoJSON `FeatureCollection` containing pipe routes and known intersections. For the current sample mission, intersections come from the synthetic/WNTR-style pipe graph. IMU can suggest a bend or branch candidate, but it cannot reliably recover the network map alone.
+GeoJSON `FeatureCollection` containing pipe routes and known intersections. For the current calibrated replay, intersections come from the WNTR/EPANET-style pipe graph. IMU can suggest a bend or branch candidate, but it cannot reliably recover the network map alone.
 
 ### robot_state.csv
 

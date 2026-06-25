@@ -1,8 +1,8 @@
 """Feature extraction for PipeOwl mission streams.
 
-This module intentionally uses only Python's standard library so demo missions
-can be generated and validated before optional dashboard dependencies are
-installed.
+This module intentionally uses only Python's standard library so calibrated
+missions can be generated and validated before optional dashboard dependencies
+are installed.
 """
 
 from __future__ import annotations

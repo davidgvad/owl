@@ -16,5 +16,5 @@ class AqualocAdapter(DatasetAdapter):
     def convert(self, input_dir: Path, output_dir: Path) -> AdapterResult:
         raise NotImplementedError(
             "AQUALOC conversion requires ROS/raw log extraction. "
-            "Expected outputs: imu.csv, robot_state.csv, reel.csv with synthetic tether."
+            "Expected outputs: imu.csv, robot_state.csv, reel.csv with modeled tether."
         )

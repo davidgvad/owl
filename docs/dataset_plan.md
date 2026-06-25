@@ -11,19 +11,19 @@ in-pipe drinking-water robot
 + pipe intersections
 ```
 
-The credible approach is to combine proxy datasets and label the sample mission honestly.
+The credible approach is to combine public datasets, calibrate the replay from them, and label which streams are still modeled until hardware logs exist.
 
 ## Sources
 
 ### SubPipe
 
-Primary public proxy for robot motion and navigation. Target files include acceleration, angular velocity, forward distance, estimated state, pressure, temperature, and water velocity.
+Primary public calibration source for robot motion and navigation. Target files include acceleration, angular velocity, forward distance, estimated state, pressure, temperature, and water velocity.
 
 Use for:
 
 - IMU acceleration
 - IMU gyro
-- distance/path proxy
+- distance/path calibration
 - pressure and flow-like mission context
 - underwater robot timestamp patterns
 
@@ -39,7 +39,7 @@ Use for:
 
 ### GPLA-12
 
-Pipeline acoustic leakage proxy. It is gas-pipeline data, not potable-water in-pipe hydrophone data.
+Pipeline acoustic leakage calibration source. It is gas-pipeline data, not potable-water in-pipe hydrophone data.
 
 Use for:
 
@@ -53,7 +53,7 @@ Use as a methodology reference for real water-network leak detection. Treat cont
 
 ### OceanShip
 
-Hydrophone-like underwater background-noise proxy.
+Hydrophone-like underwater background-noise calibration source.
 
 Use for:
 
@@ -71,7 +71,7 @@ Use for:
 - intersections
 - diameter/material metadata
 - pressure and flow context
-- synthetic leak scenarios and truth
+- modeled leak scenarios and truth
 
 ## Adapter Rule
 

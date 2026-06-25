@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pipeowl import build_demo_mission, validate_mission
+from pipeowl import build_calibrated_mission, validate_mission
 
 
 def read_csv(path: Path):
@@ -14,10 +14,10 @@ def read_csv(path: Path):
 
 
 class PipeOwlMissionTests(unittest.TestCase):
-    def test_demo_mission_validates_and_contains_expected_events(self):
+    def test_calibrated_mission_validates_and_contains_expected_events(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             mission_dir = Path(temp_dir) / "mission"
-            build_demo_mission(mission_dir)
+            build_calibrated_mission(mission_dir)
 
             errors = validate_mission(mission_dir)
             self.assertEqual(errors, [])
@@ -34,6 +34,11 @@ class PipeOwlMissionTests(unittest.TestCase):
 
             leak_events = [row for row in events if row["type"] == "possible_leak"]
             self.assertTrue(any(43.0 <= float(row["distance_m"]) <= 50.0 for row in leak_events))
+
+            metadata = (mission_dir / "metadata.json").read_text(encoding="utf-8")
+            self.assertIn("dataset_calibrated", metadata)
+            self.assertIn("SubPipe", metadata)
+            self.assertIn("GPLA-12", metadata)
 
     def test_validation_reports_missing_file(self):
         with tempfile.TemporaryDirectory() as temp_dir:

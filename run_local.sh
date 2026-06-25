@@ -13,8 +13,8 @@ if ! .venv/bin/python -c "import streamlit, pandas" >/dev/null 2>&1; then
   .venv/bin/python -m pip install -r requirements.txt
 fi
 
-echo "Generating local sample mission..."
-.venv/bin/python scripts/generate_demo_mission.py --out data/demo_mission
+echo "Generating dataset-calibrated replay mission..."
+.venv/bin/python scripts/generate_calibrated_mission.py --out data/calibrated_mission
 
 echo
 echo "PipeOwl is starting locally."

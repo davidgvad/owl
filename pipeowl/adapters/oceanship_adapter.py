@@ -11,5 +11,5 @@ class OceanShipAdapter(DatasetAdapter):
     def convert(self, input_dir: Path, output_dir: Path) -> AdapterResult:
         raise NotImplementedError(
             "OceanShip conversion should emit hydrophone.wav background-noise clips "
-            "and metadata that marks them as non-leak hydrophone proxy data."
+            "and metadata that marks them as non-leak hydrophone calibration data."
         )

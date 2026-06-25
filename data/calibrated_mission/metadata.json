@@ -1,0 +1,104 @@
+{
+  "mission_id": "calibrated_001",
+  "mission_name": "PipeOwl Dataset-Calibrated Replay",
+  "replay_mode": "dataset_calibrated",
+  "data_sources": [
+    "SubPipe public underwater pipeline-inspection dataset",
+    "AQUALOC public underwater ROV localization dataset",
+    "GPLA-12 public pipeline acoustic leakage dataset",
+    "OceanShip public underwater audio dataset",
+    "WNTR/EPANET-style water-network model"
+  ],
+  "calibration_sources": [
+    {
+      "stream": "motion_imu",
+      "source": "SubPipe public underwater pipeline-inspection dataset",
+      "use": "navigation vibration, acceleration scale, turn/gyro events, pressure/flow context",
+      "url": "https://github.com/remaro-network/SubPipe-dataset"
+    },
+    {
+      "stream": "motion_imu_pressure",
+      "source": "AQUALOC public underwater ROV localization dataset",
+      "use": "underwater IMU and pressure timing patterns",
+      "url": "https://www.lirmm.fr/aqualoc/"
+    },
+    {
+      "stream": "acoustic_leak",
+      "source": "GPLA-12 public pipeline acoustic leakage dataset",
+      "use": "pipeline-leak broadband/high-frequency acoustic scoring workflow",
+      "url": "https://arxiv.org/abs/2106.10277"
+    },
+    {
+      "stream": "acoustic_background",
+      "source": "OceanShip public underwater audio dataset",
+      "use": "hydrophone-style background and false-positive noise profile",
+      "url": "https://arxiv.org/abs/2401.02099"
+    },
+    {
+      "stream": "pipe_network",
+      "source": "WNTR/EPANET-style water-network model",
+      "use": "pipe graph, intersections, pressure/flow context, leak scenario placement",
+      "url": "https://usepa.github.io/WNTR/"
+    }
+  ],
+  "pattern_library": {
+    "steady_travel": {
+      "source": "SubPipe/AQUALOC motion calibration",
+      "imu": "low-amplitude vibration around gravity with small gyro drift",
+      "evidence": "accel_mag stable, gyro_mag low, forward distance increasing"
+    },
+    "intersection": {
+      "source": "WNTR network node + SubPipe/AQUALOC turn calibration",
+      "imu": "gyro_z rise and heading change near a mapped branch node",
+      "acoustic": "optional short flow disturbance; not treated as proof by itself",
+      "evidence": "known pipe graph node plus IMU turn pattern"
+    },
+    "impact": {
+      "source": "SubPipe/AQUALOC acceleration spike calibration",
+      "imu": "short acceleration and jerk spike",
+      "acoustic": "brief broadband click",
+      "evidence": "acceleration spike plus tether tension rise"
+    },
+    "leak": {
+      "source": "GPLA-12 acoustic leakage calibration + WNTR pressure/flow context",
+      "acoustic": "raised RMS with stronger high-frequency bandpower and sustained leak score",
+      "hydraulic": "local pressure dip and flow increase in the pipe model",
+      "evidence": "high acoustic leak score, pressure/flow anomaly, no impact/tether artifact"
+    },
+    "tether": {
+      "source": "PipeOwl MVP reel model",
+      "reel": "tether tension and payout speed used to reject false leak positives",
+      "evidence": "tension spike without matching sustained acoustic leak signature"
+    }
+  },
+  "provenance_note": "Dataset-calibrated replay: motion, IMU, hydrophone, pressure, and flow behavior are calibrated from public underwater robot and acoustic datasets. Pipe geometry, tether, and event placement are modeled until PipeOwl hardware test-loop logs replace each stream.",
+  "mode_limitations": [
+    "Not collected by a PipeOwl robot yet",
+    "No public dataset currently contains in-pipe hydrophone, IMU, tether, and leak truth together",
+    "Intersections are identified by map/IMU fusion, not hydrophone frequency alone"
+  ],
+  "pipe": {
+    "material": "PVC",
+    "diameter_mm": 100,
+    "nominal_pressure_bar": 3.2,
+    "nominal_flow_velocity_mps": 0.65
+  },
+  "sonde": {
+    "diameter_mm": 60,
+    "sensors": [
+      "hydrophone",
+      "imu",
+      "reel_encoder",
+      "tether_tension"
+    ]
+  },
+  "truth": {
+    "modeled_leak_distance_m": 47.0,
+    "modeled_impact_distance_m": 34.0,
+    "mapped_intersections_m": [
+      15.0,
+      30.0,
+      47.0
+    ]
+  }
+}

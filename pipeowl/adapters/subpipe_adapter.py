@@ -187,7 +187,7 @@ class SubPipeAdapter(DatasetAdapter):
         metadata = {
             "mission_id": "subpipe_converted",
             "data_sources": ["SubPipe public dataset", "PipeOwl synthetic reel mapping"],
-            "provenance_note": "Converted proxy underwater robot data, not real PipeOwl in-pipe mission data.",
+            "provenance_note": "Converted public underwater robot calibration data, not real PipeOwl in-pipe mission data.",
             "pipe": {
                 "material": "unknown",
                 "diameter_mm": 0,
