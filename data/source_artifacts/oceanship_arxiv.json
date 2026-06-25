@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/jTnTm+j2+5XvrJD0rS1h8fQH4SU</id>
+  <title>arXiv Query: search_query=&amp;id_list=2401.02099&amp;start=0&amp;max_results=10</title>
+  <updated>2026-06-25T09:35:57Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=10&amp;id_list=2401.02099" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2401.02099v3</id>
+    <title>Oceanship: A Large-Scale Dataset for Underwater Audio Target Recognition</title>
+    <updated>2024-06-11T02:33:56Z</updated>
+    <link href="https://arxiv.org/abs/2401.02099v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2401.02099v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The recognition of underwater audio plays a significant role in identifying a vessel while it is in motion. Underwater target recognition tasks have a wide range of applications in areas such as marine environmental protection, detection of ship radiated noise, underwater noise control, and coastal vessel dispatch. The traditional UATR task involves training a network to extract features from audio data and predict the vessel type. The current UATR dataset exhibits shortcomings in both duration and sample quantity. In this paper, we propose Oceanship, a large-scale and diverse underwater audio dataset. This dataset comprises 15 categories, spans a total duration of 121 hours, and includes comprehensive annotation information such as coordinates, velocity, vessel types, and timestamps. We compiled the dataset by crawling and organizing original communication data from the Ocean Communication Network (ONC) database between 2021 and 2022. While audio retrieval tasks are well-established in general audio classification, they have not been explored in the context of underwater audio recognition. Leveraging the Oceanship dataset, we introduce a baseline model named Oceannet for underwater audio retrieval. This model achieves a recall at 1 (R@1) accuracy of 67.11% and a recall at 5 (R@5) accuracy of 99.13% on the Deepship dataset.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.AS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-01-04T07:11:16Z</published>
+    <arxiv:comment>Accepted by ICIC 2024</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zeyu Li</name>
+    </author>
+    <author>
+      <name>Suncheng Xiang</name>
+    </author>
+    <author>
+      <name>Tong Yu</name>
+    </author>
+    <author>
+      <name>Jingsheng Gao</name>
+    </author>
+    <author>
+      <name>Jiacheng Ruan</name>
+    </author>
+    <author>
+      <name>Yanping Hu</name>
+    </author>
+    <author>
+      <name>Ting Liu</name>
+    </author>
+    <author>
+      <name>Yuzhuo Fu</name>
+    </author>
+  </entry>
+</feed>

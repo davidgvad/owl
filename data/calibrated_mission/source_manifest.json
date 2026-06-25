@@ -1,0 +1,266 @@
+{
+  "manifest_version": "1.0",
+  "purpose": "Auditable source-proof bundle for the PipeOwl dataset-calibrated replay.",
+  "honest_claim": "The replay is calibrated from public proxy datasets and real source artifacts. It is not yet PipeOwl hardware data, and no public source combines in-pipe hydrophone, IMU, tether, pipe intersections, and leak truth in one dataset.",
+  "artifacts": [
+    {
+      "id": "GPLA12_README",
+      "stream": "acoustic_leak",
+      "title": "GPLA-12 dataset README",
+      "role": "Public source description for pipeline acoustic leakage samples",
+      "source_url": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/README.md",
+      "local_file": "gpla12_readme.md",
+      "claim_supported": "GPLA-12 is a public pipeline acoustic leakage dataset used as leak-audio proxy evidence.",
+      "local_path": "data/source_artifacts/gpla12_readme.md",
+      "status": "available",
+      "size_bytes": 946,
+      "sha256": "be7d2dadb75a3ea565983e92ba6b93dcec838bd46c23f4eab4fa186de4f7ba9f"
+    },
+    {
+      "id": "GPLA12_DATA_V1",
+      "stream": "acoustic_leak",
+      "title": "GPLA-12 raw acoustic data v1 CSV",
+      "role": "Real acoustic leakage signal table used to calibrate leak-score patterns",
+      "source_url": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/data/data_v1/data.csv",
+      "local_file": "gpla12_data_v1_data.csv",
+      "claim_supported": "Leak-like replay audio uses GPLA-12 acoustic scale and high-frequency scoring workflow as a proxy, not PipeOwl hardware audio.",
+      "local_path": "data/source_artifacts/gpla12_data_v1_data.csv",
+      "status": "available",
+      "size_bytes": 3702331,
+      "sha256": "00135bf5f4a417d07219dd9cd340dd3834dd2cbb75aea7b11fdacfba2f0fcba1"
+    },
+    {
+      "id": "GPLA12_LABELS_V1",
+      "stream": "acoustic_leak",
+      "title": "GPLA-12 v1 labels CSV",
+      "role": "Real public labels for the GPLA-12 acoustic rows",
+      "source_url": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/data/data_v1/label.csv",
+      "local_file": "gpla12_data_v1_label.csv",
+      "claim_supported": "Leak scoring is calibrated against labeled public leakage categories rather than invented labels.",
+      "local_path": "data/source_artifacts/gpla12_data_v1_label.csv",
+      "status": "available",
+      "size_bytes": 2223,
+      "sha256": "97235dd9abdb0abf3082bb310c96ca300f276b948e15dacf9465b4ef20997332"
+    },
+    {
+      "id": "GPLA12_LICENSE",
+      "stream": "license",
+      "title": "GPLA-12 repository license",
+      "role": "License proof for the bundled GPLA-12 source artifacts",
+      "source_url": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/LICENSE",
+      "local_file": "gpla12_license.txt",
+      "claim_supported": "The proof bundle records licensing context for the acoustic proxy artifacts.",
+      "local_path": "data/source_artifacts/gpla12_license.txt",
+      "status": "available",
+      "size_bytes": 14197,
+      "sha256": "8c349f80764d0648e645f41ef23772a70c995a0924b5235f735f4a3d09df127c"
+    },
+    {
+      "id": "GPLA12_TREE",
+      "stream": "acoustic_leak",
+      "title": "GPLA-12 GitHub repository tree",
+      "role": "GitHub API index proving the public raw acoustic and label file paths",
+      "source_url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/trees/main?recursive=1",
+      "local_file": "gpla12_tree.json",
+      "claim_supported": "The bundled GPLA-12 raw data and label files come from public repository paths.",
+      "local_path": "data/source_artifacts/gpla12_tree.json",
+      "status": "available",
+      "size_bytes": 4024,
+      "sha256": "8ca57c8aabf4113fb60926df558e542d197c5b5185ef6103d838f54093da45ee"
+    },
+    {
+      "id": "SUBPIPE_README",
+      "stream": "motion_imu",
+      "title": "SubPipe dataset README",
+      "role": "Public source description of underwater pipeline inspection IMU/navigation files",
+      "source_url": "https://raw.githubusercontent.com/remaro-network/SubPipe-dataset/main/README.md",
+      "local_file": "subpipe_readme.md",
+      "claim_supported": "IMU, pressure, flow, and forward-distance replay patterns are calibrated from a real underwater pipeline-inspection dataset description.",
+      "local_path": "data/source_artifacts/subpipe_readme.md",
+      "status": "available",
+      "size_bytes": 7658,
+      "sha256": "28fff7d820ad0b259fe7feba696cf0aeee94e30b64496bc3d07589958075c6bd"
+    },
+    {
+      "id": "SUBPIPE_ZENODO",
+      "stream": "motion_imu",
+      "title": "SubPipe Zenodo record metadata",
+      "role": "Official archive metadata and file sizes for the full SubPipe dataset",
+      "source_url": "https://zenodo.org/api/records/10053564",
+      "local_file": "subpipe_zenodo_record.json",
+      "claim_supported": "SubPipe raw archives exist publicly but are multi-GB, so this repo stores metadata proof instead of bundling the full dataset.",
+      "local_path": "data/source_artifacts/subpipe_zenodo_record.json",
+      "status": "available",
+      "size_bytes": 14549,
+      "sha256": "66f6cfc0248533c261affa09001c25965bddc7018b53b8ec3c7b9d62f22652b1"
+    },
+    {
+      "id": "SUBPIPE_LICENSE",
+      "stream": "license",
+      "title": "SubPipe repository license",
+      "role": "License proof for the SubPipe source metadata artifact",
+      "source_url": "https://raw.githubusercontent.com/remaro-network/SubPipe-dataset/main/LICENSE",
+      "local_file": "subpipe_license.txt",
+      "claim_supported": "The proof bundle records licensing context for the SubPipe metadata artifact.",
+      "local_path": "data/source_artifacts/subpipe_license.txt",
+      "status": "available",
+      "size_bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "id": "AQUALOC_PAGE",
+      "stream": "motion_imu_pressure",
+      "title": "AQUALOC official dataset page",
+      "role": "Underwater ROV IMU/pressure timing reference",
+      "source_url": "https://www.lirmm.fr/aqualoc/",
+      "local_file": "aqualoc_page.html",
+      "claim_supported": "AQUALOC supports the underwater IMU and pressure-timestamping assumptions used by the replay framework.",
+      "local_path": "data/source_artifacts/aqualoc_page.html",
+      "status": "available",
+      "size_bytes": 10012,
+      "sha256": "3601659ec59da785c3a45db5b817ce46d80d2204db117a925ed577fba9ccfb16"
+    },
+    {
+      "id": "OCEANSHIP_ARXIV",
+      "stream": "acoustic_background",
+      "title": "OceanShip arXiv metadata",
+      "role": "Hydrophone-style underwater background-noise reference",
+      "source_url": "https://export.arxiv.org/api/query?id_list=2401.02099",
+      "local_file": "oceanship_arxiv.json",
+      "claim_supported": "OceanShip is used only as a public underwater acoustic background reference, not as leak truth.",
+      "local_path": "data/source_artifacts/oceanship_arxiv.json",
+      "status": "available",
+      "size_bytes": 3268,
+      "sha256": "b86696d114e3819551d67df4de1125a65f71caf19e3df0c6f44ceae509359a74"
+    },
+    {
+      "id": "WNTR_README",
+      "stream": "pipe_network",
+      "title": "WNTR repository README",
+      "role": "Public source description for EPANET-compatible water-network modeling",
+      "source_url": "https://raw.githubusercontent.com/USEPA/WNTR/main/README.md",
+      "local_file": "wntr_readme.md",
+      "claim_supported": "Pipe geometry and hydraulic context use WNTR/EPANET-style network modeling.",
+      "local_path": "data/source_artifacts/wntr_readme.md",
+      "status": "available",
+      "size_bytes": 4572,
+      "sha256": "c0c235f22facacdeeec5aed0f2fdd9778f7a5a38dd5d4a77de66346868a6f49d"
+    },
+    {
+      "id": "WNTR_NET3_INP",
+      "stream": "pipe_network",
+      "title": "WNTR Net3 EPANET network",
+      "role": "Real EPANET input file proving the network/intersection data format",
+      "source_url": "https://raw.githubusercontent.com/USEPA/WNTR/main/examples/networks/Net3.inp",
+      "local_file": "wntr_net3.inp",
+      "claim_supported": "The replay route is shaped like a water-network graph and can map distance to nodes/intersections using EPANET-style data.",
+      "local_path": "data/source_artifacts/wntr_net3.inp",
+      "status": "available",
+      "size_bytes": 31249,
+      "sha256": "ea3e825c4fef0b5cba47fb06301bc85253f18b6364dc96c44d9fb492c40faa52"
+    },
+    {
+      "id": "WNTR_LEAKS_INP",
+      "stream": "pipe_network",
+      "title": "WNTR leak test EPANET network",
+      "role": "Real EPANET input file with leak-testing context",
+      "source_url": "https://raw.githubusercontent.com/USEPA/WNTR/main/wntr/tests/networks_for_testing/leaks.inp",
+      "local_file": "wntr_leaks.inp",
+      "claim_supported": "Leak placement and hydraulic context are represented as water-network scenarios, not inferred from IMU alone.",
+      "local_path": "data/source_artifacts/wntr_leaks.inp",
+      "status": "available",
+      "size_bytes": 15999,
+      "sha256": "1b3e2f9304c5e4f17f0c8a6ae9845f8a462b2f715d690e0f3d7a0a3f250b9982"
+    },
+    {
+      "id": "WNTR_LICENSE",
+      "stream": "license",
+      "title": "WNTR repository license",
+      "role": "License proof for bundled WNTR source artifacts",
+      "source_url": "https://raw.githubusercontent.com/USEPA/WNTR/main/LICENSE.md",
+      "local_file": "wntr_license.txt",
+      "claim_supported": "The proof bundle records licensing context for WNTR/EPANET artifacts.",
+      "local_path": "data/source_artifacts/wntr_license.txt",
+      "status": "available",
+      "size_bytes": 4787,
+      "sha256": "1ea2266f0cd710165d06807307f86553ce0ac7f7b6755f5bd2a9929a88900dd1"
+    },
+    {
+      "id": "WNTR_TREE",
+      "stream": "pipe_network",
+      "title": "WNTR GitHub repository tree",
+      "role": "GitHub API index proving the public EPANET network file paths",
+      "source_url": "https://api.github.com/repos/USEPA/WNTR/git/trees/main?recursive=1",
+      "local_file": "wntr_tree.json",
+      "claim_supported": "The bundled WNTR Net3 and leak-test EPANET files come from public repository paths.",
+      "local_path": "data/source_artifacts/wntr_tree.json",
+      "status": "available",
+      "size_bytes": 140159,
+      "sha256": "f021d690b76cfb59170645a3cbc430370892e45f052d8b206a2c350b733a3bcb"
+    }
+  ],
+  "evidence_summary": {
+    "gpla12": {
+      "label_rows": 684,
+      "data_rows": 684,
+      "samples_per_row": 1460,
+      "source_artifacts": [
+        "GPLA12_DATA_V1",
+        "GPLA12_LABELS_V1"
+      ]
+    },
+    "subpipe": {
+      "zenodo_archives": [
+        {
+          "name": "SubPipeMini2.zip",
+          "size_bytes": 4945761374
+        },
+        {
+          "name": "SubPipeMini.zip",
+          "size_bytes": 6078303615
+        },
+        {
+          "name": "SubPipe.zip",
+          "size_bytes": 28011923314
+        }
+      ],
+      "source_artifacts": [
+        "SUBPIPE_README",
+        "SUBPIPE_ZENODO"
+      ]
+    },
+    "wntr": {
+      "net3_junction_rows": 92,
+      "net3_pipe_rows": 117,
+      "leak_test_junction_rows": 2,
+      "leak_test_pipe_rows": 2,
+      "source_artifacts": [
+        "WNTR_NET3_INP",
+        "WNTR_LEAKS_INP"
+      ]
+    },
+    "aqualoc": {
+      "page_matches": [
+        "MEMS-IMU",
+        "pressure sensor",
+        "ROS",
+        "raw data"
+      ],
+      "source_artifacts": [
+        "AQUALOC_PAGE"
+      ]
+    },
+    "oceanship": {
+      "source_artifacts": [
+        "OCEANSHIP_ARXIV"
+      ],
+      "role": "underwater acoustic background reference only"
+    }
+  },
+  "claim_boundaries": [
+    "GPLA-12 is gas-pipeline acoustic leakage data, used as a leak-audio proxy.",
+    "SubPipe/AQUALOC support underwater robot motion and IMU/pressure behavior, not drinking-water in-pipe sonde truth.",
+    "WNTR/EPANET artifacts support pipe-network geometry and hydraulic context.",
+    "Intersections come from network geometry plus IMU turn patterns; hydrophone frequency alone is not treated as intersection proof."
+  ]
+}

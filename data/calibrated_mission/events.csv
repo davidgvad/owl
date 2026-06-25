@@ -1,7 +1,7 @@
 event_id,type,time_s,distance_m,x_m,y_m,confidence,source,notes
-E001,intersection,21.43,15,15,0,0.95,network_geometry,known pipe graph node plus IMU turn pattern. Source: WNTR network node + SubPipe/AQUALOC turn calibration
-E002,intersection,42.86,30,30,0,0.95,network_geometry,known pipe graph node plus IMU turn pattern. Source: WNTR network node + SubPipe/AQUALOC turn calibration
-E006,possible_bend,42.86,30,30,0,0.67,imu_network_fusion,gyro_z rise and heading change near a mapped branch node. Source: WNTR network node + SubPipe/AQUALOC turn calibration
-E004,possible_impact,48.57,34,33.53,1.88,0.78,imu_reel_fusion,acceleration spike plus tether tension rise. Source: SubPipe/AQUALOC acceleration spike calibration
-E005,possible_leak,66,46.55,44.6,7.79,0.85,hydrophone_hydraulic_fusion,"high acoustic leak score, pressure/flow anomaly, no impact/tether artifact. Source: GPLA-12 acoustic leakage calibration + WNTR pressure/flow context"
-E003,intersection,67.14,47,45,8,0.95,network_geometry,known pipe graph node plus IMU turn pattern. Source: WNTR network node + SubPipe/AQUALOC turn calibration
+E001,intersection,21.43,15,15,0,0.95,network_geometry,"known pipe graph node plus IMU turn pattern. Source: WNTR network node + SubPipe/AQUALOC turn calibration. Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+E002,intersection,42.86,30,30,0,0.95,network_geometry,"known pipe graph node plus IMU turn pattern. Source: WNTR network node + SubPipe/AQUALOC turn calibration. Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+E006,possible_bend,42.86,30,30,0,0.67,imu_network_fusion,"gyro_z rise and heading change near a mapped branch node. Source: WNTR network node + SubPipe/AQUALOC turn calibration. Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+E004,possible_impact,48.57,34,33.53,1.88,0.78,imu_reel_fusion,"acceleration spike plus tether tension rise. Source: SubPipe/AQUALOC acceleration spike calibration. Proof IDs: SUBPIPE_README, SUBPIPE_ZENODO, AQUALOC_PAGE"
+E005,possible_leak,66,46.55,44.6,7.79,0.85,hydrophone_hydraulic_fusion,"high acoustic leak score, pressure/flow anomaly, no impact/tether artifact. Source: GPLA-12 acoustic leakage calibration + WNTR pressure/flow context. Proof IDs: GPLA12_DATA_V1, GPLA12_LABELS_V1, WNTR_LEAKS_INP"
+E003,intersection,67.14,47,45,8,0.95,network_geometry,"known pipe graph node plus IMU turn pattern. Source: WNTR network node + SubPipe/AQUALOC turn calibration. Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"

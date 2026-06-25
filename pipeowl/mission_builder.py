@@ -11,6 +11,7 @@ from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 from .features import add_imu_features, extract_acoustic_features, interpolate_distance
 from .calibration_profiles import CALIBRATION_SOURCES, PATTERN_LIBRARY
+from .provenance import write_mission_source_manifest
 from .schemas import REQUIRED_COLUMNS, write_csv
 
 Point = Tuple[float, float]
@@ -80,6 +81,11 @@ def write_metadata(out_dir: Path) -> None:
         "mission_name": "PipeOwl Dataset-Calibrated Replay",
         "replay_mode": "dataset_calibrated",
         "data_sources": [source["source"] for source in CALIBRATION_SOURCES],
+        "source_manifest": "source_manifest.json",
+        "source_proof_note": (
+            "See source_manifest.json for downloaded public artifacts, source URLs, "
+            "file sizes, and SHA-256 hashes used to support the calibration story."
+        ),
         "calibration_sources": CALIBRATION_SOURCES,
         "pattern_library": PATTERN_LIBRARY,
         "provenance_note": (
@@ -348,7 +354,11 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
             distance_m,
             0.95,
             "network_geometry",
-            f"{PATTERN_LIBRARY['intersection']['evidence']}. Source: {PATTERN_LIBRARY['intersection']['source']}",
+            (
+                f"{PATTERN_LIBRARY['intersection']['evidence']}. "
+                f"Source: {PATTERN_LIBRARY['intersection']['source']}. "
+                "Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+            ),
         )
 
     impact_time = distance_to_time(IMPACT_DISTANCE_M)
@@ -359,7 +369,11 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         IMPACT_DISTANCE_M,
         0.78,
         "imu_reel_fusion",
-        f"{PATTERN_LIBRARY['impact']['evidence']}. Source: {PATTERN_LIBRARY['impact']['source']}",
+        (
+            f"{PATTERN_LIBRARY['impact']['evidence']}. "
+            f"Source: {PATTERN_LIBRARY['impact']['source']}. "
+            "Proof IDs: SUBPIPE_README, SUBPIPE_ZENODO, AQUALOC_PAGE"
+        ),
     )
 
     leak_candidates = sorted(
@@ -387,7 +401,11 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                 float(best["distance_m"]),
                 confidence,
                 "hydrophone_hydraulic_fusion",
-                f"{PATTERN_LIBRARY['leak']['evidence']}. Source: {PATTERN_LIBRARY['leak']['source']}",
+                (
+                    f"{PATTERN_LIBRARY['leak']['evidence']}. "
+                    f"Source: {PATTERN_LIBRARY['leak']['source']}. "
+                    "Proof IDs: GPLA12_DATA_V1, GPLA12_LABELS_V1, WNTR_LEAKS_INP"
+                ),
             )
             break
 
@@ -399,7 +417,11 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         bend_distance,
         0.67,
         "imu_network_fusion",
-        f"{PATTERN_LIBRARY['intersection']['imu']}. Source: {PATTERN_LIBRARY['intersection']['source']}",
+        (
+            f"{PATTERN_LIBRARY['intersection']['imu']}. "
+            f"Source: {PATTERN_LIBRARY['intersection']['source']}. "
+            "Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+        ),
     )
 
     return sorted(events, key=lambda row: float(row["time_s"]))
@@ -445,3 +467,4 @@ def build_calibrated_mission(out_dir: Path) -> None:
         REQUIRED_COLUMNS["acoustic_features.csv"],
     )
     write_csv(out_dir / "events.csv", format_rows(event_rows), REQUIRED_COLUMNS["events.csv"])
+    write_mission_source_manifest(out_dir)

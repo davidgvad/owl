@@ -28,6 +28,15 @@ def load_json(path: str):
 
 
 @st.cache_data
+def load_optional_json(path: str):
+    target = Path(path)
+    if not target.exists():
+        return {}
+    with target.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+@st.cache_data
 def load_csv(path: str) -> pd.DataFrame:
     return pd.read_csv(path)
 
@@ -127,11 +136,45 @@ def prepare_robot_state(robot_state: pd.DataFrame, acoustic: pd.DataFrame, reel:
     return rows
 
 
+def prepare_proof(source_manifest: Dict) -> Dict:
+    summary = source_manifest.get("evidence_summary", {})
+    gpla = summary.get("gpla12", {})
+    subpipe = summary.get("subpipe", {})
+    wntr = summary.get("wntr", {})
+    artifacts = []
+    for artifact in source_manifest.get("artifacts", []):
+        if artifact.get("stream") == "license":
+            continue
+        artifacts.append(
+            {
+                "id": artifact.get("id", ""),
+                "title": artifact.get("title", ""),
+                "role": artifact.get("role", ""),
+                "sha": artifact.get("sha256", "")[:12],
+                "size": int(artifact.get("size_bytes", 0) or 0),
+                "url": artifact.get("source_url", ""),
+                "status": artifact.get("status", "missing"),
+            }
+        )
+
+    return {
+        "honestClaim": source_manifest.get("honest_claim", "No source manifest bundled."),
+        "summary": [
+            f"GPLA-12 acoustic rows: {gpla.get('data_rows', 0)} x {gpla.get('samples_per_row', 0)}",
+            f"GPLA-12 label rows: {gpla.get('label_rows', 0)}",
+            f"SubPipe archive metadata: {len(subpipe.get('zenodo_archives', []))} public files indexed",
+            f"WNTR Net3 network: {wntr.get('net3_junction_rows', 0)} junctions, {wntr.get('net3_pipe_rows', 0)} pipes",
+        ],
+        "artifacts": artifacts,
+    }
+
+
 def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataFrame,
-                    reel: pd.DataFrame, events: pd.DataFrame) -> str:
+                    reel: pd.DataFrame, events: pd.DataFrame, source_manifest: Dict) -> str:
     pipes = prepare_network(network)
     prepared_events = prepare_events(events)
     prepared_state = prepare_robot_state(robot_state, acoustic, reel)
+    prepared_proof = prepare_proof(source_manifest)
     max_distance = float(robot_state["distance_m"].max())
 
     payload = json.dumps(
@@ -139,6 +182,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             "pipes": pipes,
             "events": prepared_events,
             "states": prepared_state,
+            "proof": prepared_proof,
             "maxDistance": max_distance,
         }
     )
@@ -239,6 +283,20 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
       const upcomingText = upcoming
         ? `${{upcoming.label}} at ${{upcoming.distance.toFixed(1)}} m`
         : "End of route";
+
+      const proofFacts = mission.proof.summary.map((fact) => `
+        <div class="proof-fact">${{fact}}</div>
+      `).join("");
+
+      const proofRows = mission.proof.artifacts.slice(0, 6).map((artifact) => `
+        <a class="proof-row" href="${{artifact.url}}" target="_blank" rel="noreferrer">
+          <div>
+            <strong>${{artifact.id}}</strong>
+            <span>${{artifact.status}} | ${{(artifact.size / 1024).toFixed(1)}} KB | sha ${{artifact.sha}}</span>
+          </div>
+          <p>${{artifact.role}}</p>
+        </a>
+      `).join("") || `<div class="empty">No source manifest bundled.</div>`;
 
       root.innerHTML = `
         <style>
@@ -468,6 +526,45 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             color: #64748b;
             padding-top: 10px;
           }}
+          .proof-card {{
+            border: 1px solid #dbe3ea;
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 12px;
+            margin-top: 14px;
+          }}
+          .proof-fact {{
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.35;
+            padding: 3px 0;
+          }}
+          .proof-row {{
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            border-top: 1px solid #e5edf2;
+            padding: 9px 0;
+          }}
+          .proof-row div {{
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+          }}
+          .proof-row strong {{
+            font-size: 12px;
+          }}
+          .proof-row span {{
+            color: #64748b;
+            font-size: 11px;
+            white-space: nowrap;
+          }}
+          .proof-row p {{
+            margin: 4px 0 0;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.3;
+          }}
           .legend {{
             position: absolute;
             left: 14px;
@@ -567,6 +664,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
               </div>
               <div class="mode-label">Reached data</div>
               ${{reachedRows}}
+              <div class="proof-card">
+                <div class="mode-label">Proof bundle</div>
+                ${{proofFacts}}
+                ${{proofRows}}
+              </div>
             </div>
           </div>
         </div>
@@ -651,6 +753,7 @@ def main() -> None:
     reel = load_csv(str(mission_path("reel.csv")))
     acoustic = load_csv(str(mission_path("acoustic_features.csv")))
     events = load_csv(str(mission_path("events.csv")))
+    source_manifest = load_optional_json(str(mission_path("source_manifest.json")))
 
     st.title("PipeOwl dataset-calibrated pipe robot replay")
     st.markdown(
@@ -659,8 +762,8 @@ def main() -> None:
     )
 
     components.html(
-        simulation_html(network, robot_state, acoustic, reel, events),
-        height=760,
+        simulation_html(network, robot_state, acoustic, reel, events, source_manifest),
+        height=900,
         scrolling=False,
     )
 

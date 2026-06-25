@@ -40,6 +40,7 @@ mission_001/
   hydrophone.wav
   acoustic_features.csv
   events.csv
+  source_manifest.json
 ```
 
 ## Generate The Dataset-Calibrated Replay
@@ -52,6 +53,30 @@ python3 scripts/validate_mission.py data/calibrated_mission
 ```
 
 It creates a modeled pipe route with intersections, robot motion, IMU vibration/turn events, tether payout/tension, hydrophone audio calibrated from public acoustic patterns, acoustic features, and fused event cards.
+
+## Source Proof Bundle
+
+The repo includes small, auditable public-source artifacts under `data/source_artifacts/`.
+The generated mission copies their hashes and evidence summary into:
+
+```text
+data/calibrated_mission/source_manifest.json
+```
+
+That manifest records source URLs, local file sizes, SHA-256 hashes, and the exact claim each artifact supports. Current proof includes:
+
+- GPLA-12 raw acoustic CSV and labels: real public pipeline acoustic leakage proxy data
+- SubPipe README and Zenodo metadata: public underwater pipeline-inspection IMU/navigation archive proof
+- WNTR/EPANET `.inp` files: real water-network graph and leak-scenario format proof
+- AQUALOC official page and OceanShip arXiv metadata: underwater IMU/pressure and hydrophone-background references
+
+Rebuild the proof bundle with:
+
+```sh
+python3 scripts/fetch_source_proof.py --out data/source_artifacts --mission data/calibrated_mission
+```
+
+This does not claim we have PipeOwl hardware logs yet. It proves the replay is calibrated from real public/proxy artifacts, with hashes, while the route and final mission are still a controlled simulation.
 
 ## Run Tests
 
@@ -110,8 +135,10 @@ Run the robot controller simulator:
 - `pipeowl/schemas.py`: canonical mission schema and validator
 - `pipeowl/features.py`: IMU and acoustic feature extraction
 - `pipeowl/calibration_profiles.py`: public dataset calibration source and pattern assumptions
+- `pipeowl/provenance.py`: source artifact hashes, evidence summary, and proof manifest writer
 - `pipeowl/mission_builder.py`: deterministic dataset-calibrated replay generator
 - `pipeowl/adapters/`: public dataset adapter skeletons
+- `scripts/fetch_source_proof.py`: downloads public proof artifacts and writes `source_manifest.json`
 - `scripts/generate_calibrated_mission.py`: creates `data/calibrated_mission`
 - `app_streamlit.py`: mission replay dashboard
 - `include/`, `src/`: C++ robot controller prototype

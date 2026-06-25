@@ -9,6 +9,8 @@
     "OceanShip public underwater audio dataset",
     "WNTR/EPANET-style water-network model"
   ],
+  "source_manifest": "source_manifest.json",
+  "source_proof_note": "See source_manifest.json for downloaded public artifacts, source URLs, file sizes, and SHA-256 hashes used to support the calibration story.",
   "calibration_sources": [
     {
       "stream": "motion_imu",

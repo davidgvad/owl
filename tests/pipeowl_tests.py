@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -39,6 +40,14 @@ class PipeOwlMissionTests(unittest.TestCase):
             self.assertIn("dataset_calibrated", metadata)
             self.assertIn("SubPipe", metadata)
             self.assertIn("GPLA-12", metadata)
+            self.assertIn("source_manifest.json", metadata)
+
+            source_manifest = json.loads((mission_dir / "source_manifest.json").read_text(encoding="utf-8"))
+            artifact_ids = {artifact["id"] for artifact in source_manifest["artifacts"]}
+            self.assertIn("GPLA12_DATA_V1", artifact_ids)
+            self.assertIn("SUBPIPE_ZENODO", artifact_ids)
+            self.assertIn("WNTR_NET3_INP", artifact_ids)
+            self.assertEqual(source_manifest["evidence_summary"]["gpla12"]["label_rows"], 684)
 
     def test_validation_reports_missing_file(self):
         with tempfile.TemporaryDirectory() as temp_dir:

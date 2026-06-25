@@ -1,0 +1,99 @@
+{
+  "sha": "afec271f4eb445a976826c6a45485892e5fbab53",
+  "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/trees/afec271f4eb445a976826c6a45485892e5fbab53",
+  "tree": [
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e48e0963459bf4c4e175956b657a8f4a91967880",
+      "size": 14197,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/e48e0963459bf4c4e175956b657a8f4a91967880"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f9ffbbcb37f05318d8de139ee3dd842446fcfe9",
+      "size": 946,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/9f9ffbbcb37f05318d8de139ee3dd842446fcfe9"
+    },
+    {
+      "path": "clock.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9bad6a4e1cb4662b01b112b9c59769312186931f",
+      "size": 3449,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/9bad6a4e1cb4662b01b112b9c59769312186931f"
+    },
+    {
+      "path": "data",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9a01d90ca1646b8841aad071f6f3ab5c187ac626",
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/trees/9a01d90ca1646b8841aad071f6f3ab5c187ac626"
+    },
+    {
+      "path": "data/data_v1",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "24c4990083db2d6444d1d27e6511b9bc5442a190",
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/trees/24c4990083db2d6444d1d27e6511b9bc5442a190"
+    },
+    {
+      "path": "data/data_v1/data.csv",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b526f69d5f279475e727e009f693a9716bd7cff7",
+      "size": 3702331,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/b526f69d5f279475e727e009f693a9716bd7cff7"
+    },
+    {
+      "path": "data/data_v1/label.csv",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16878220f3546d1fa5dce7e0647bb5a6c8e55c46",
+      "size": 2223,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/16878220f3546d1fa5dce7e0647bb5a6c8e55c46"
+    },
+    {
+      "path": "data/data_v2",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ba8b293b8b2ab21fced956adb5346dc6e2dfa8b1",
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/trees/ba8b293b8b2ab21fced956adb5346dc6e2dfa8b1"
+    },
+    {
+      "path": "data/data_v2/data.xlsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "622a2d6f7b832d368035b4ac3dfb1508338084f2",
+      "size": 3985781,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/622a2d6f7b832d368035b4ac3dfb1508338084f2"
+    },
+    {
+      "path": "data/data_v2/lable.xlsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32f82721d44cf66ab06986bdb8ac90623f563df9",
+      "size": 14590,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/32f82721d44cf66ab06986bdb8ac90623f563df9"
+    },
+    {
+      "path": "data/data_v3",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e09e0356b6de2d26fbfd60030d1f53e5e25fecd6",
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/trees/e09e0356b6de2d26fbfd60030d1f53e5e25fecd6"
+    },
+    {
+      "path": "data/data_v3/data_v3",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8b137891791fe96927ad78e64b0aad7bded08bdc",
+      "size": 1,
+      "url": "https://api.github.com/repos/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/git/blobs/8b137891791fe96927ad78e64b0aad7bded08bdc"
+    }
+  ],
+  "truncated": false
+}
