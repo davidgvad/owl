@@ -195,7 +195,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
     const width = 1100;
     const height = 610;
     const bounds = {{ minX: -3, maxX: 66, minY: -13, maxY: 18 }};
-    const state = {{ playing: false, index: 0, speed: 1.0, frame: null, lastTick: null }};
+    const state = {{ playing: false, index: 0, speed: 1.0, frame: null, lastTick: null, proofOpen: false }};
 
     root.addEventListener("pointerdown", (event) => {{
       const target = event.target.closest ? event.target.closest("button") : null;
@@ -211,6 +211,16 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
       if (target.id === "resetBtn") {{
         event.preventDefault();
         reset();
+      }}
+      if (target.id === "proofBtn") {{
+        event.preventDefault();
+        state.proofOpen = true;
+        render();
+      }}
+      if (target.id === "closeProofBtn") {{
+        event.preventDefault();
+        state.proofOpen = false;
+        render();
       }}
     }});
 
@@ -323,6 +333,57 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         </a>
       `).join("") || `<div class="empty">No source manifest bundled.</div>`;
 
+      const modalFacts = mission.proof.summary.map((fact) => `
+        <li>${{fact}}</li>
+      `).join("");
+
+      const proofModal = state.proofOpen ? `
+        <div class="modal-backdrop">
+          <section class="proof-modal" role="dialog" aria-modal="true" aria-label="Data validity explanation">
+            <div class="modal-head">
+              <div>
+                <div class="mode-label">Data validity</div>
+                <h2>Why this simulation is trustable</h2>
+              </div>
+              <button id="closeProofBtn" class="icon-button">Close</button>
+            </div>
+            <p class="modal-lede">
+              This is not claimed as PipeOwl hardware data yet. It is a controlled replay calibrated from real public source artifacts, with source URLs and SHA-256 hashes in <strong>source_manifest.json</strong>.
+            </p>
+            <div class="proof-grid">
+              <div class="proof-explain">
+                <h3>What is real</h3>
+                <ul>
+                  ${{modalFacts}}
+                  <li>Each proof artifact has a source URL, local size, and SHA-256 hash.</li>
+                </ul>
+              </div>
+              <div class="proof-explain">
+                <h3>How we map it</h3>
+                <ul>
+                  <li>GPLA-12 acoustic rows calibrate leak-like audio features: RMS, peak, bandpower, centroid, and leak score.</li>
+                  <li>SubPipe and AQUALOC support underwater IMU behavior: steady vibration, gyro turns, pressure timing, and impact-like spikes.</li>
+                  <li>WNTR/EPANET networks provide pipe graph logic: junctions, pipes, leak scenarios, and distance-to-location mapping.</li>
+                  <li>The tether/reel model converts replay time into distance, then distance is mapped onto the pipe route.</li>
+                </ul>
+              </div>
+              <div class="proof-explain wide">
+                <h3>How detections are fused</h3>
+                <p>
+                  A leak event needs a high acoustic score plus pressure/flow context and no matching IMU impact or tether jerk. An intersection comes from network geometry and is supported by an IMU turn pattern. The demo does not pretend hydrophone frequency alone can identify pipe branches.
+                </p>
+              </div>
+              <div class="proof-explain wide boundary">
+                <h3>Boundary of the claim</h3>
+                <p>
+                  The trustworthy claim is: real public/proxy datasets calibrate a repeatable PipeOwl mission replay. The next milestone is replacing each proxy stream with data from a physical PipeOwl test loop.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      ` : "";
+
       root.innerHTML = `
         <style>
           #pipeowl-sim {{
@@ -330,28 +391,31 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             color: #17202a;
           }}
           .sim-shell {{
-            border: 1px solid #dbe3ea;
-            border-radius: 12px;
+            border: 1px solid #cbd9e3;
+            border-radius: 10px;
             overflow: hidden;
             background: #f7fafc;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
           }}
           .topbar {{
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
-            padding: 14px 16px;
-            border-bottom: 1px solid #dbe3ea;
+            padding: 16px 18px;
+            border-bottom: 1px solid #d8e3eb;
             background: #ffffff;
           }}
           .title {{
-            font-size: 19px;
-            font-weight: 760;
+            color: #111827;
+            font-size: 20px;
+            font-weight: 800;
           }}
           .subtitle {{
-            margin-top: 2px;
-            color: #5f6f7b;
-            font-size: 13px;
+            margin-top: 4px;
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.35;
           }}
           .controls {{
             display: flex;
@@ -368,6 +432,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             color: #17202a;
             cursor: pointer;
           }}
+          button.secondary {{
+            background: #eef6f8;
+            border-color: #b7cbd4;
+            color: #17465a;
+          }}
           button.primary {{
             background: #0f766e;
             color: #ffffff;
@@ -379,19 +448,19 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
           }}
           .sim-grid {{
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 330px;
-            min-height: 620px;
+            grid-template-columns: minmax(0, 1fr) 380px;
+            min-height: 660px;
           }}
           .map-panel {{
             position: relative;
-            min-height: 620px;
+            min-height: 660px;
             background:
               radial-gradient(circle at 50% 46%, rgba(14, 116, 144, 0.10), transparent 36%),
               linear-gradient(180deg, #edf4f7, #d9e7ec);
           }}
           .pipe-svg {{
             width: 100%;
-            height: 620px;
+            height: 660px;
             display: block;
           }}
           .pipe {{
@@ -462,8 +531,9 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
           .side-panel {{
             border-left: 1px solid #dbe3ea;
             background: #ffffff;
-            padding: 16px;
-            overflow: hidden;
+            padding: 18px;
+            max-height: 660px;
+            overflow-y: auto;
           }}
           .mode-card {{
             border: 1px solid #dbe3ea;
@@ -473,7 +543,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             margin-bottom: 12px;
           }}
           .mode-label {{
-            color: #64748b;
+            color: #526274;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.07em;
@@ -497,7 +567,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             background: #ffffff;
           }}
           .metric div:first-child {{
-            color: #64748b;
+            color: #526274;
             font-size: 12px;
             font-weight: 750;
           }}
@@ -512,7 +582,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
           .progress-label {{
             display: flex;
             justify-content: space-between;
-            color: #64748b;
+            color: #475569;
             font-size: 12px;
             font-weight: 750;
             margin-bottom: 6px;
@@ -538,18 +608,19 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             gap: 12px;
           }}
           .event-row strong {{
-            font-size: 14px;
+            color: #111827;
+            font-size: 15px;
           }}
           .event-row span {{
-            color: #64748b;
+            color: #475569;
             font-size: 13px;
             white-space: nowrap;
           }}
           .event-row p {{
             margin: 5px 0 0;
-            color: #475569;
-            font-size: 13px;
-            line-height: 1.35;
+            color: #263445;
+            font-size: 14px;
+            line-height: 1.42;
           }}
           .empty {{
             color: #64748b;
@@ -563,9 +634,9 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             margin-top: 14px;
           }}
           .proof-fact {{
-            color: #334155;
-            font-size: 13px;
-            line-height: 1.35;
+            color: #263445;
+            font-size: 14px;
+            line-height: 1.42;
             padding: 3px 0;
           }}
           .proof-row {{
@@ -581,18 +652,97 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             gap: 8px;
           }}
           .proof-row strong {{
-            font-size: 12px;
+            font-size: 13px;
           }}
           .proof-row span {{
-            color: #64748b;
-            font-size: 11px;
+            color: #526274;
+            font-size: 12px;
             white-space: nowrap;
           }}
           .proof-row p {{
             margin: 4px 0 0;
-            color: #475569;
-            font-size: 12px;
-            line-height: 1.3;
+            color: #263445;
+            font-size: 13px;
+            line-height: 1.35;
+          }}
+          .modal-backdrop {{
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(6, 16, 24, 0.62);
+          }}
+          .proof-modal {{
+            width: min(880px, 96vw);
+            max-height: 86vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #cbd9e3;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.35);
+            padding: 24px;
+          }}
+          .modal-head {{
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid #e3edf3;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+          }}
+          .modal-head h2 {{
+            margin: 3px 0 0;
+            color: #111827;
+            font-size: 27px;
+            line-height: 1.1;
+          }}
+          .icon-button {{
+            background: #111827;
+            color: #ffffff;
+            border-color: #111827;
+          }}
+          .modal-lede {{
+            margin: 0 0 18px;
+            color: #263445;
+            font-size: 16px;
+            line-height: 1.5;
+          }}
+          .proof-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+          }}
+          .proof-explain {{
+            border: 1px solid #dbe5ec;
+            border-radius: 10px;
+            padding: 14px;
+            background: #f8fafc;
+          }}
+          .proof-explain.wide {{
+            grid-column: 1 / -1;
+          }}
+          .proof-explain.boundary {{
+            background: #fff7ed;
+            border-color: #fed7aa;
+          }}
+          .proof-explain h3 {{
+            margin: 0 0 8px;
+            color: #111827;
+            font-size: 17px;
+          }}
+          .proof-explain ul {{
+            margin: 0;
+            padding-left: 18px;
+          }}
+          .proof-explain li,
+          .proof-explain p {{
+            color: #263445;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 7px;
           }}
           .legend {{
             position: absolute;
@@ -627,6 +777,10 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             .side-panel {{
               border-left: 0;
               border-top: 1px solid #dbe3ea;
+              max-height: none;
+            }}
+            .proof-grid {{
+              grid-template-columns: 1fr;
             }}
           }}
         </style>
@@ -637,6 +791,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
               <div class="subtitle">Press Start. The robot moves through the pipe and explains each detected pattern.</div>
             </div>
             <div class="controls">
+              <button id="proofBtn" class="secondary">Why trust data?</button>
               <button id="startBtn" class="primary" ${{state.playing ? "disabled" : ""}}>${{startLabel}}</button>
               <button id="pauseBtn" ${{state.playing ? "" : "disabled"}}>Pause</button>
               <button id="resetBtn">Reset</button>
@@ -701,6 +856,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             </div>
           </div>
         </div>
+        ${{proofModal}}
       `;
 
     }}
@@ -782,6 +938,9 @@ def main() -> None:
             padding-top: 1rem;
             max-width: 1240px;
           }
+          .stApp {
+            background: #0b1017;
+          }
           [data-testid="stHeader"],
           [data-testid="stToolbar"],
           [data-testid="stDecoration"],
@@ -799,11 +958,14 @@ def main() -> None:
             padding-top: 0;
           }
           h1 {
+            color: #f8fafc;
             margin-bottom: 0.2rem;
             letter-spacing: 0;
           }
           .intro {
-            color: #556370;
+            color: #d8e1ea;
+            font-size: 16px;
+            line-height: 1.45;
             margin-bottom: 1rem;
           }
         </style>
@@ -831,7 +993,7 @@ def main() -> None:
 
     components.html(
         simulation_html(network, robot_state, acoustic, reel, events, source_manifest),
-        height=900,
+        height=980,
         scrolling=False,
     )
 
