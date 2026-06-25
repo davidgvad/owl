@@ -730,6 +730,22 @@ def main() -> None:
             padding-top: 1rem;
             max-width: 1240px;
           }
+          [data-testid="stHeader"],
+          [data-testid="stToolbar"],
+          [data-testid="stDecoration"],
+          [data-testid="stDeployButton"],
+          [data-testid="stStatusWidget"],
+          [data-testid="stMainMenu"],
+          .stDeployButton,
+          #MainMenu,
+          footer {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+          }
+          .stApp {
+            padding-top: 0;
+          }
           h1 {
             margin-bottom: 0.2rem;
             letter-spacing: 0;
