@@ -195,7 +195,30 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
     const width = 1100;
     const height = 610;
     const bounds = {{ minX: -3, maxX: 66, minY: -13, maxY: 18 }};
-    const state = {{ playing: false, index: 0, speed: 1.0, timer: null }};
+    const state = {{ playing: false, index: 0, speed: 1.0, frame: null, lastTick: null }};
+
+    root.addEventListener("pointerdown", (event) => {{
+      const target = event.target.closest ? event.target.closest("button") : null;
+      if (!target || target.disabled) return;
+      if (target.id === "startBtn") {{
+        event.preventDefault();
+        start();
+      }}
+      if (target.id === "pauseBtn") {{
+        event.preventDefault();
+        pause();
+      }}
+      if (target.id === "resetBtn") {{
+        event.preventDefault();
+        reset();
+      }}
+    }});
+
+    root.addEventListener("input", (event) => {{
+      if (event.target && event.target.id === "speedRange") {{
+        state.speed = Number(event.target.value);
+      }}
+    }});
 
     function sx(x) {{
       return 80 + ((x - bounds.minX) / (bounds.maxX - bounds.minX)) * (width - 160);
@@ -241,6 +264,8 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
       const progress = mission.maxDistance > 0 ? distance / mission.maxDistance : 0;
       const reached = activeEvents(distance);
       const upcoming = nextEvent(distance);
+      const atEnd = state.index >= mission.states.length - 1;
+      const startLabel = atEnd ? "Restart" : (state.index > 0 ? "Resume" : "Start");
 
       const pipeElements = mission.pipes.map((pipe) => {{
         const isMain = pipe.id.startsWith("MAIN");
@@ -347,6 +372,10 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             background: #0f766e;
             color: #ffffff;
             border-color: #0f766e;
+          }}
+          button:disabled {{
+            cursor: default;
+            opacity: 0.48;
           }}
           .sim-grid {{
             display: grid;
@@ -608,8 +637,8 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
               <div class="subtitle">Press Start. The robot moves through the pipe and explains each detected pattern.</div>
             </div>
             <div class="controls">
-              <button id="startBtn" class="primary">Start</button>
-              <button id="pauseBtn">Pause</button>
+              <button id="startBtn" class="primary" ${{state.playing ? "disabled" : ""}}>${{startLabel}}</button>
+              <button id="pauseBtn" ${{state.playing ? "" : "disabled"}}>Pause</button>
               <button id="resetBtn">Reset</button>
               <label>
                 Speed
@@ -674,44 +703,67 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         </div>
       `;
 
-      document.getElementById("startBtn").onclick = start;
-      document.getElementById("pauseBtn").onclick = pause;
-      document.getElementById("resetBtn").onclick = reset;
-      document.getElementById("speedRange").oninput = (event) => {{
-        state.speed = Number(event.target.value);
-      }};
     }}
 
-    function step() {{
-      if (!state.playing) return;
-      state.index = clamp(state.index + Math.max(1, Math.round(state.speed * 2)), 0, mission.states.length - 1);
-      if (state.index >= mission.states.length - 1) {{
-        pause();
+    function cancelLoop() {{
+      if (state.frame !== null) {{
+        cancelAnimationFrame(state.frame);
+        state.frame = null;
+      }}
+      state.lastTick = null;
+    }}
+
+    function tick(timestamp) {{
+      if (!state.playing) {{
+        state.frame = null;
         return;
       }}
-      render();
+
+      if (state.lastTick === null) {{
+        state.lastTick = timestamp;
+      }}
+
+      const frameMs = 120;
+      const elapsed = timestamp - state.lastTick;
+      if (elapsed >= frameMs) {{
+        const speedStep = Math.max(1, Math.round(state.speed * 2));
+        const elapsedSteps = Math.max(1, Math.floor(elapsed / frameMs));
+        state.index = clamp(state.index + speedStep * elapsedSteps, 0, mission.states.length - 1);
+        state.lastTick = timestamp;
+        render();
+      }}
+
+      if (state.index >= mission.states.length - 1) {{
+        state.playing = false;
+        cancelLoop();
+        render();
+        return;
+      }}
+
+      state.frame = requestAnimationFrame(tick);
     }}
 
     function start() {{
+      if (!mission.states.length) return;
       if (state.playing) return;
-      state.playing = true;
-      if (!state.timer) {{
-        state.timer = setInterval(step, 120);
+      if (state.index >= mission.states.length - 1) {{
+        state.index = 0;
       }}
+      state.playing = true;
+      cancelLoop();
       render();
+      state.frame = requestAnimationFrame(tick);
     }}
 
     function pause() {{
       state.playing = false;
-      if (state.timer) {{
-        clearInterval(state.timer);
-        state.timer = null;
-      }}
+      cancelLoop();
       render();
     }}
 
     function reset() {{
-      pause();
+      state.playing = false;
+      cancelLoop();
       state.index = 0;
       render();
     }}
