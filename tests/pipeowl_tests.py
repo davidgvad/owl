@@ -43,6 +43,7 @@ class PipeOwlMissionTests(unittest.TestCase):
             self.assertIn("possible_leak", event_types)
             self.assertIn("intersection", event_types)
             self.assertIn("possible_impact", event_types)
+            self.assertTrue(all(row["evidence"] for row in events))
 
             acoustic = read_csv(mission_dir / "acoustic_features.csv")
             max_leak_score = max(float(row["leak_score"]) for row in acoustic)
@@ -50,6 +51,7 @@ class PipeOwlMissionTests(unittest.TestCase):
 
             leak_events = [row for row in events if row["type"] == "possible_leak"]
             self.assertTrue(any(43.0 <= float(row["distance_m"]) <= 50.0 for row in leak_events))
+            self.assertTrue(any("Leak score" in row["evidence"] for row in leak_events))
 
             metadata = (mission_dir / "metadata.json").read_text(encoding="utf-8")
             self.assertIn("dataset_calibrated", metadata)

@@ -68,8 +68,12 @@ window_start_s,window_end_s,distance_m,rms,peak,bandpower_100_500,bandpower_500_
 Required columns:
 
 ```csv
-event_id,type,time_s,distance_m,x_m,y_m,confidence,source,notes
+event_id,type,time_s,distance_m,x_m,y_m,confidence,source,evidence,notes
 ```
+
+`evidence` is a pipe-separated list of the characterizing parameters recorded
+for that event, such as `Leak score 0.91 | Pressure change -0.18 bar |
+Accel check max 9.92 m/s^2`.
 
 Current event types:
 

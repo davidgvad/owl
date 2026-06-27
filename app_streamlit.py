@@ -93,6 +93,9 @@ def prepare_network(network: Dict) -> List[Dict]:
 def prepare_events(events: pd.DataFrame) -> List[Dict]:
     prepared = []
     for _, event in events.sort_values("distance_m").iterrows():
+        raw_evidence = event.get("evidence", "")
+        if pd.isna(raw_evidence):
+            raw_evidence = ""
         prepared.append(
             {
                 "id": str(event["event_id"]),
@@ -103,6 +106,11 @@ def prepare_events(events: pd.DataFrame) -> List[Dict]:
                 "y": float(event["y_m"]),
                 "confidence": float(event["confidence"]),
                 "source": str(event["source"]),
+                "evidence": [
+                    item.strip()
+                    for item in str(raw_evidence).split("|")
+                    if item.strip()
+                ],
                 "notes": str(event["notes"]),
                 "color": event_color(str(event["type"])),
             }
@@ -435,15 +443,24 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         `;
       }}).join("");
 
-      const reachedRows = reached.slice(-5).reverse().map((event) => `
+      const reachedRows = reached.slice(-5).reverse().map((event) => {{
+        const evidenceChips = event.evidence.map((item) => `<span class="event-chip">${{item}}</span>`).join("");
+        return `
         <div class="event-row">
-          <div>
+          <div class="event-row-head">
             <strong>${{event.label}}</strong>
             <span>${{event.distance.toFixed(1)}} m</span>
           </div>
+          ${{evidenceChips ? `
+            <div class="event-evidence">
+              <div class="event-evidence-title">Characterizing parameters</div>
+              <div class="event-chips">${{evidenceChips}}</div>
+            </div>
+          ` : ""}}
           <p>${{event.notes}}</p>
         </div>
-      `).join("") || `<div class="empty">No events reached yet.</div>`;
+      `;
+      }}).join("") || `<div class="empty">No events reached yet.</div>`;
 
       const upcomingText = upcoming
         ? `${{upcoming.label}} at ${{upcoming.distance.toFixed(1)}} m`
@@ -770,7 +787,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             border-top: 1px solid #e5edf2;
             padding: 10px 0;
           }}
-          .event-row div {{
+          .event-row-head {{
             display: flex;
             justify-content: space-between;
             gap: 12px;
@@ -789,6 +806,40 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             color: #263445;
             font-size: 14px;
             line-height: 1.42;
+          }}
+          .event-evidence {{
+            display: block;
+            margin-top: 8px;
+            padding: 8px;
+            border: 1px solid #dbe5ec;
+            border-radius: 8px;
+            background: #f8fafc;
+          }}
+          .event-evidence-title {{
+            color: #526274;
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+          }}
+          .event-chips {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+          }}
+          .event-chip {{
+            display: inline-block;
+            max-width: 100%;
+            border: 1px solid #cbd5df;
+            border-radius: 999px;
+            background: #ffffff;
+            padding: 4px 7px;
+            color: #17202a;
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
           }}
           .empty {{
             color: #64748b;

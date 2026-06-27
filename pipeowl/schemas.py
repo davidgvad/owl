@@ -73,6 +73,7 @@ REQUIRED_COLUMNS: Mapping[str, Sequence[str]] = {
         "y_m",
         "confidence",
         "source",
+        "evidence",
         "notes",
     ),
 }

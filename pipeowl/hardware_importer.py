@@ -187,6 +187,80 @@ def rows_in_time(rows: Iterable[Mapping[str, object]], start_s: float, end_s: fl
     return [row for row in rows if start_s <= float(row["time_s"]) <= end_s]
 
 
+def nearest_time_row(rows: Sequence[Mapping[str, object]],
+                     time_field: str,
+                     time_s: float) -> Mapping[str, object]:
+    return min(rows, key=lambda row: abs(float(row[time_field]) - time_s))
+
+
+def signed_value(value: float, unit: str, decimals: int = 2) -> str:
+    return f"{value:+.{decimals}f} {unit}"
+
+
+def create_event_evidence(event_type: str,
+                          time_s: float,
+                          robot_state_rows: Sequence[Mapping[str, object]],
+                          imu_rows: Sequence[Mapping[str, object]],
+                          reel_rows: Sequence[Mapping[str, object]],
+                          acoustic_rows: Sequence[Mapping[str, object]]) -> str:
+    state = nearest_time_row(robot_state_rows, "time_s", time_s) if robot_state_rows else {}
+    acoustic = min(
+        acoustic_rows,
+        key=lambda row: abs(float(row["window_start_s"]) - time_s),
+    ) if acoustic_rows else {}
+    imu_window = rows_in_time(imu_rows, time_s - 0.8, time_s + 0.8)
+    reel_window = rows_in_time(reel_rows, time_s - 0.8, time_s + 0.8)
+    max_accel = max((float(row["accel_mag"]) for row in imu_window), default=9.81)
+    max_jerk = max((abs(float(row["jerk"])) for row in imu_window), default=0.0)
+    max_gyro = max((float(row["gyro_mag"]) for row in imu_window), default=0.0)
+    max_gyro_z = max((abs(float(row["gz_radps"])) for row in imu_window), default=0.0)
+    max_tension = max((float(row["tether_tension_N"]) for row in reel_window), default=0.0)
+    base_pressure = float(robot_state_rows[0]["pressure_bar"]) if robot_state_rows else 0.0
+    base_flow = float(robot_state_rows[0]["flow_velocity_mps"]) if robot_state_rows else 0.0
+    pressure_change = float(state.get("pressure_bar", base_pressure)) - base_pressure
+    flow_change = float(state.get("flow_velocity_mps", base_flow)) - base_flow
+
+    if event_type == "possible_leak":
+        return " | ".join(
+            [
+                f"Leak score {float(acoustic.get('leak_score', 0.0)):.2f}",
+                f"RMS {float(acoustic.get('rms', 0.0)):.3f}",
+                f"High band {float(acoustic.get('bandpower_2000_10000', 0.0)):.2e}",
+                f"Pressure change {signed_value(pressure_change, 'bar')}",
+                f"Flow change {signed_value(flow_change, 'm/s')}",
+                f"Accel check max {max_accel:.2f} m/s^2",
+                f"Tether check max {max_tension:.2f} N",
+            ]
+        )
+
+    if event_type == "possible_impact":
+        return " | ".join(
+            [
+                f"Accel increase {signed_value(max_accel - 9.81, 'm/s^2')}",
+                f"Jerk spike {max_jerk:.1f} m/s^3",
+                f"Tether max {max_tension:.2f} N",
+                f"Leak score nearby {float(acoustic.get('leak_score', 0.0)):.2f}",
+            ]
+        )
+
+    if event_type == "possible_bend":
+        return " | ".join(
+            [
+                f"gyro_z peak {max_gyro_z:.3f} rad/s",
+                f"gyro_mag peak {max_gyro:.3f} rad/s",
+                f"Accel max {max_accel:.2f} m/s^2",
+            ]
+        )
+
+    return " | ".join(
+        [
+            f"Accel max {max_accel:.2f} m/s^2",
+            f"gyro_mag max {max_gyro:.3f} rad/s",
+            f"Tether max {max_tension:.2f} N",
+        ]
+    )
+
+
 def create_detected_events(robot_state_rows: Sequence[Mapping[str, object]],
                            imu_rows: Sequence[Mapping[str, object]],
                            reel_rows: Sequence[Mapping[str, object]],
@@ -199,6 +273,7 @@ def create_detected_events(robot_state_rows: Sequence[Mapping[str, object]],
                   distance_m: float,
                   confidence: float,
                   source: str,
+                  evidence: str,
                   notes: str) -> None:
         pose = pose_at_distance(robot_state_rows, distance_m)
         events.append(
@@ -211,6 +286,7 @@ def create_detected_events(robot_state_rows: Sequence[Mapping[str, object]],
                 "y_m": round(pose["y_m"], 2),
                 "confidence": round(max(0.0, min(1.0, confidence)), 2),
                 "source": source,
+                "evidence": evidence,
                 "notes": notes,
             }
         )
@@ -226,6 +302,14 @@ def create_detected_events(robot_state_rows: Sequence[Mapping[str, object]],
                 float(impact["distance_m"]),
                 min(0.95, 0.35 + impact_strength / 9.0),
                 "hardware_imu",
+                create_event_evidence(
+                    "possible_impact",
+                    float(impact["time_s"]),
+                    robot_state_rows,
+                    imu_rows,
+                    reel_rows,
+                    acoustic_rows,
+                ),
                 "Detected from real IMU acceleration/jerk spike in imported PipeOwl logs.",
             )
 
@@ -238,6 +322,14 @@ def create_detected_events(robot_state_rows: Sequence[Mapping[str, object]],
                 float(turn["distance_m"]),
                 min(0.9, 0.35 + float(turn["gyro_mag"])),
                 "hardware_imu",
+                create_event_evidence(
+                    "possible_bend",
+                    float(turn["time_s"]),
+                    robot_state_rows,
+                    imu_rows,
+                    reel_rows,
+                    acoustic_rows,
+                ),
                 "Detected from real IMU gyro magnitude rise in imported PipeOwl logs.",
             )
 
@@ -261,6 +353,14 @@ def create_detected_events(robot_state_rows: Sequence[Mapping[str, object]],
                 float(candidate["distance_m"]),
                 float(candidate["leak_score"]),
                 "hardware_hydrophone",
+                create_event_evidence(
+                    "possible_leak",
+                    start_s,
+                    robot_state_rows,
+                    imu_rows,
+                    reel_rows,
+                    acoustic_rows,
+                ),
                 "Detected from real hydrophone audio features with no matching IMU impact or tether artifact.",
             )
             break

@@ -318,6 +318,103 @@ def row_window(rows: Iterable[Mapping[str, object]],
     ]
 
 
+def nearest_row(rows: Sequence[Mapping[str, object]],
+                time_field: str,
+                time_s: float) -> Mapping[str, object]:
+    return min(rows, key=lambda row: abs(float(row[time_field]) - time_s))
+
+
+def signed_value(value: float, unit: str, decimals: int = 2) -> str:
+    return f"{value:+.{decimals}f} {unit}"
+
+
+def heading_delta(before: float, after: float) -> float:
+    return abs(math.atan2(math.sin(after - before), math.cos(after - before)))
+
+
+def create_event_evidence(event_type: str,
+                          time_s: float,
+                          robot_state_rows: Sequence[Mapping[str, object]],
+                          imu_rows: Sequence[Mapping[str, object]],
+                          reel_rows: Sequence[Mapping[str, object]],
+                          acoustic_rows: Sequence[Mapping[str, object]]) -> str:
+    state = nearest_row(robot_state_rows, "time_s", time_s)
+    before = nearest_row(robot_state_rows, "time_s", max(0.0, time_s - 1.2))
+    after = nearest_row(robot_state_rows, "time_s", time_s + 1.2)
+    acoustic = min(
+        acoustic_rows,
+        key=lambda row: abs(float(row["window_start_s"]) - time_s),
+    )
+    imu_window = row_window(imu_rows, "time_s", time_s - 0.8, time_s + 0.8)
+    reel_window = row_window(reel_rows, "time_s", time_s - 0.8, time_s + 0.8)
+
+    max_accel = max((float(row["accel_mag"]) for row in imu_window), default=9.81)
+    max_jerk = max((abs(float(row["jerk"])) for row in imu_window), default=0.0)
+    max_gyro = max((float(row["gyro_mag"]) for row in imu_window), default=0.0)
+    max_gyro_z = max((abs(float(row["gz_radps"])) for row in imu_window), default=0.0)
+    max_tension = max((float(row["tether_tension_N"]) for row in reel_window), default=0.0)
+    base_pressure = float(robot_state_rows[0]["pressure_bar"])
+    base_flow = float(robot_state_rows[0]["flow_velocity_mps"])
+    base_tension = float(reel_rows[0]["tether_tension_N"]) if reel_rows else 0.0
+    turn = heading_delta(float(before["heading_rad"]), float(after["heading_rad"]))
+    pressure_change = float(state["pressure_bar"]) - base_pressure
+    flow_change = float(state["flow_velocity_mps"]) - base_flow
+    accel_increase = max_accel - 9.81
+    tension_increase = max_tension - base_tension
+
+    if event_type == "possible_leak":
+        return " | ".join(
+            [
+                f"Leak score {float(acoustic['leak_score']):.2f}",
+                f"RMS {float(acoustic['rms']):.3f}",
+                f"High band {float(acoustic['bandpower_2000_10000']):.2e}",
+                f"Centroid {float(acoustic['spectral_centroid_hz']):.0f} Hz",
+                f"Pressure change {signed_value(pressure_change, 'bar')}",
+                f"Flow change {signed_value(flow_change, 'm/s')}",
+                f"Accel check max {max_accel:.2f} m/s^2",
+                f"Tether check max {max_tension:.2f} N",
+            ]
+        )
+
+    if event_type == "possible_impact":
+        return " | ".join(
+            [
+                f"Accel increase {signed_value(accel_increase, 'm/s^2')}",
+                f"Jerk spike {max_jerk:.1f} m/s^3",
+                f"Tether tension change {signed_value(tension_increase, 'N')}",
+                f"Leak score nearby {float(acoustic['leak_score']):.2f}",
+            ]
+        )
+
+    if event_type == "possible_bend":
+        return " | ".join(
+            [
+                f"gyro_z peak {max_gyro_z:.3f} rad/s",
+                f"gyro_mag peak {max_gyro:.3f} rad/s",
+                f"Heading change {turn:.2f} rad",
+                "Mapped branch node nearby",
+            ]
+        )
+
+    if event_type == "intersection":
+        return " | ".join(
+            [
+                "Network node degree 3",
+                f"Route distance {float(state['distance_m']):.1f} m",
+                f"gyro_z support {max_gyro_z:.3f} rad/s",
+                f"Heading change {turn:.2f} rad",
+            ]
+        )
+
+    return " | ".join(
+        [
+            f"Accel max {max_accel:.2f} m/s^2",
+            f"gyro_mag max {max_gyro:.3f} rad/s",
+            f"Tether max {max_tension:.2f} N",
+        ]
+    )
+
+
 def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                   imu_rows: Sequence[Mapping[str, object]],
                   reel_rows: Sequence[Mapping[str, object]],
@@ -330,6 +427,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                      distance_m: float,
                      confidence: float,
                      source: str,
+                     evidence: str,
                      notes: str) -> None:
         pose = distance_to_pose(distance_m)
         events.append(
@@ -342,6 +440,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                 "y_m": round(float(pose["y_m"]), 2),
                 "confidence": round(confidence, 2),
                 "source": source,
+                "evidence": evidence,
                 "notes": notes,
             }
         )
@@ -354,8 +453,16 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
             distance_m,
             0.95,
             "network_geometry",
+            create_event_evidence(
+                "intersection",
+                distance_to_time(distance_m),
+                robot_state_rows,
+                imu_rows,
+                reel_rows,
+                acoustic_rows,
+            ),
             (
-                f"{PATTERN_LIBRARY['intersection']['evidence']}. "
+                "known pipe graph node; IMU/heading support shown in characterizing parameters. "
                 f"Source: {PATTERN_LIBRARY['intersection']['source']}. "
                 "Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
             ),
@@ -369,6 +476,14 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         IMPACT_DISTANCE_M,
         0.78,
         "imu_reel_fusion",
+        create_event_evidence(
+            "possible_impact",
+            impact_time,
+            robot_state_rows,
+            imu_rows,
+            reel_rows,
+            acoustic_rows,
+        ),
         (
             f"{PATTERN_LIBRARY['impact']['evidence']}. "
             f"Source: {PATTERN_LIBRARY['impact']['source']}. "
@@ -401,6 +516,14 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                 float(best["distance_m"]),
                 confidence,
                 "hydrophone_hydraulic_fusion",
+                create_event_evidence(
+                    "possible_leak",
+                    start_s,
+                    robot_state_rows,
+                    imu_rows,
+                    reel_rows,
+                    acoustic_rows,
+                ),
                 (
                     f"{PATTERN_LIBRARY['leak']['evidence']}. "
                     f"Source: {PATTERN_LIBRARY['leak']['source']}. "
@@ -417,6 +540,14 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         bend_distance,
         0.67,
         "imu_network_fusion",
+        create_event_evidence(
+            "possible_bend",
+            distance_to_time(bend_distance),
+            robot_state_rows,
+            imu_rows,
+            reel_rows,
+            acoustic_rows,
+        ),
         (
             f"{PATTERN_LIBRARY['intersection']['imu']}. "
             f"Source: {PATTERN_LIBRARY['intersection']['source']}. "
