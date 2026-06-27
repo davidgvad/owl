@@ -281,7 +281,15 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
     const width = 1100;
     const height = 610;
     const bounds = {{ minX: -3, maxX: 66, minY: -13, maxY: 18 }};
-    const state = {{ playing: false, index: 0, speed: 1.0, frame: null, lastTick: null, proofOpen: false }};
+    const state = {{
+      playing: false,
+      index: 0,
+      speed: 1.0,
+      frame: null,
+      lastTick: null,
+      proofOpen: false,
+      sideScrollTop: 0,
+    }};
 
     root.addEventListener("pointerdown", (event) => {{
       const target = event.target.closest ? event.target.closest("button") : null;
@@ -315,6 +323,12 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         state.speed = Number(event.target.value);
       }}
     }});
+
+    root.addEventListener("scroll", (event) => {{
+      if (event.target && event.target.classList && event.target.classList.contains("side-panel")) {{
+        state.sideScrollTop = event.target.scrollTop;
+      }}
+    }}, true);
 
     function sx(x) {{
       return 80 + ((x - bounds.minX) / (bounds.maxX - bounds.minX)) * (width - 160);
@@ -376,6 +390,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
     }}
 
     function render() {{
+      const previousSidePanel = root.querySelector(".side-panel");
+      if (previousSidePanel) {{
+        state.sideScrollTop = previousSidePanel.scrollTop;
+      }}
+
       const row = currentState();
       const distance = row.distance;
       const progress = mission.maxDistance > 0 ? distance / mission.maxDistance : 0;
@@ -1042,6 +1061,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         </div>
         ${{proofModal}}
       `;
+
+      const nextSidePanel = root.querySelector(".side-panel");
+      if (nextSidePanel) {{
+        nextSidePanel.scrollTop = state.sideScrollTop;
+      }}
 
     }}
 
