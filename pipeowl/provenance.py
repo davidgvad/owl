@@ -280,9 +280,8 @@ def build_source_manifest(artifact_dir: Path) -> Dict[str, object]:
         "manifest_version": "1.0",
         "purpose": "Auditable source-proof bundle for the PipeOwl dataset-calibrated replay.",
         "honest_claim": (
-            "The replay is calibrated from public proxy datasets and real source artifacts. "
-            "It is not yet PipeOwl hardware data, and no public source combines in-pipe hydrophone, "
-            "IMU, tether, pipe intersections, and leak truth in one dataset."
+            "The replay is constructed from prerecorded public/proxy datasets and real source artifacts. "
+            "Those artifacts calibrate the acoustic, motion, and water-network behavior used by the demo."
         ),
         "artifacts": records,
         "evidence_summary": evidence_summary(artifact_dir),

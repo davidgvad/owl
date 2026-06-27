@@ -95,9 +95,9 @@ def write_metadata(out_dir: Path) -> None:
             "test-loop logs replace each stream."
         ),
         "mode_limitations": [
-            "Not collected by a PipeOwl robot yet",
-            "No public dataset currently contains in-pipe hydrophone, IMU, tether, and leak truth together",
-            "Intersections are identified by map/IMU fusion, not hydrophone frequency alone",
+            "Constructed from prerecorded public/proxy datasets and a repeatable replay route",
+            "No single public dataset contains hydrophone, IMU, tether, pipe intersections, and leak truth together",
+            "Intersections are identified by network geometry plus IMU turn patterns",
         ],
         "pipe": {
             "material": "PVC",

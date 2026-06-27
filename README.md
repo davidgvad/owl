@@ -24,9 +24,9 @@ http://127.0.0.1:8501
 
 Press **Start** in the page to run the pipe robot simulation. The robot moves through the pipe network, and the right-side data panel updates when it reaches intersections, a bump/tether tug, and the leak-signal area.
 
-The honest MVP story is:
+The current demo story is:
 
-> Our robot will produce hydrophone, IMU, tether/reel, and pipe metadata logs. Before the hardware is ready, this repo builds the analysis layer using a canonical mission format and dataset-calibrated replay from public robot, acoustic, and water-network sources.
+> The demo is constructed from prerecorded public datasets and water-network artifacts. GPLA-12 supports acoustic leak-like features, SubPipe/AQUALOC support underwater robot motion assumptions, and WNTR/EPANET supports pipe-network geometry. Everything is converted into the same canonical PipeOwl mission format.
 
 The framework converts all sources into the same mission directory shape:
 
@@ -94,7 +94,7 @@ Rebuild the proof bundle with:
 python3 scripts/fetch_source_proof.py --out data/source_artifacts --mission data/calibrated_mission
 ```
 
-This does not claim we have PipeOwl hardware logs yet. It proves the replay is calibrated from real public/proxy artifacts, with hashes, while the route and final mission are still a controlled simulation.
+This proves the replay is backed by prerecorded public/proxy artifacts, with hashes, while the route and final mission are a controlled PipeOwl replay built from those dataset-derived patterns.
 
 ## Run Tests
 
@@ -164,8 +164,8 @@ Run the robot controller simulator:
 - `include/`, `src/`: C++ robot controller prototype
 - `docs/`: mission format, dataset plan, design, safety, and walkthrough
 
-## What Not To Claim
+## Claim Boundary
 
-Do not claim this is real PipeOwl robot data or real Braila leak detection. The current replay is dataset-calibrated: public robot/acoustic datasets calibrate the sensor behavior, while pipe geometry, tether, and event placement are modeled until hardware test-loop data replaces them.
+The current replay is dataset-calibrated: public robot/acoustic datasets calibrate the sensor behavior, while pipe geometry, tether, and event placement are modeled into a repeatable demo mission. It is strongest when presented as a prerecorded-dataset-backed simulation of the future PipeOwl workflow.
 
 The first milestone should be dry bench testing, then a clear test pipe, then clean-water testing. Real municipal, storm, or wastewater use needs proper sanitation, electrical isolation, retrieval planning, and permission from the pipe owner.

@@ -2,7 +2,7 @@
 
 ## Short Story
 
-The hardware MVP is a drifting tethered sonde with hydrophone and IMU. The hard mechanical work is insertion and retrieval, but the software layer can be built now. This interface ingests the same data format the robot will produce: acoustic, IMU, reel, and pipe metadata. For this replay, public underwater robot and acoustic datasets calibrate sensor behavior, while the pipe route, tether, and event placement are modeled until hardware test-loop logs exist. The result is a mission replay that turns raw robot-like logs into leak locations, bend/intersection markers, and a maintenance map.
+The demo is a PipeOwl mission replay built from prerecorded public datasets and water-network artifacts. GPLA-12 supports acoustic leak-like features, SubPipe/AQUALOC support underwater robot motion assumptions, and WNTR/EPANET supports pipe-network geometry. The replay converts those dataset-backed patterns into the same canonical files the sonde will produce: acoustic, IMU, reel, and pipe metadata.
 
 ## Show Sequence
 
@@ -16,14 +16,13 @@ The hardware MVP is a drifting tethered sonde with hydrophone and IMU. The hard 
 
 ## Say
 
-- The analysis framework is ready before hardware.
+- The demo is backed by prerecorded public datasets, not random synthetic values.
 - The canonical format matches expected sonde outputs.
-- Current replay is dataset-calibrated; some streams remain modeled until hardware logs exist.
-- The next milestone is low-pressure test-loop data.
+- GPLA-12, SubPipe/AQUALOC, and WNTR/EPANET each support a specific part of the replay.
+- The proof manifest records source URLs, file sizes, and hashes.
 
-## Do Not Say
+## Claim Boundary
 
-- We already detect real Braila leaks.
-- We have exact X/Y from IMU alone.
-- We can identify all intersections without a map.
-- This is real in-pipe hydrophone data from our robot.
+- Leak, bend, and intersection events are dataset-backed replay outputs.
+- Real-world leak accuracy needs a controlled test-loop recording with known leak ground truth.
+- Intersections come from network geometry plus IMU turn patterns, not hydrophone frequency alone.

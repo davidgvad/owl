@@ -203,10 +203,10 @@ def prepare_proof(source_manifest: Dict) -> Dict:
             f"WNTR Net3 network: {wntr.get('net3_junction_rows', 0)} junctions, {wntr.get('net3_pipe_rows', 0)} pipes",
         ]
         modal = {
-            "title": "Why this simulation is trustable",
+            "title": "Why this demo is dataset-backed",
             "lede": (
-                "This is not claimed as PipeOwl hardware data yet. It is a controlled replay calibrated from real "
-                "public source artifacts, with source URLs and SHA-256 hashes in source_manifest.json."
+                "This demo is constructed from prerecorded public source artifacts and a repeatable replay layer. "
+                "The source URLs, local file sizes, and SHA-256 hashes are recorded in source_manifest.json."
             ),
             "realItems": [
                 "GPLA-12 supplies real public acoustic leakage rows and labels.",
@@ -225,8 +225,8 @@ def prepare_proof(source_manifest: Dict) -> Dict:
                 "tether jerk. An intersection comes from network geometry and is supported by an IMU turn pattern."
             ),
             "boundaryText": (
-                "The trustworthy claim is: real public/proxy datasets calibrate a repeatable PipeOwl mission replay. "
-                "The next milestone is replacing each proxy stream with data from a physical PipeOwl test loop."
+                "The trustworthy claim is: prerecorded public/proxy datasets calibrate the acoustic, motion, and "
+                "pipe-network behavior used in this repeatable PipeOwl mission replay."
             ),
         }
         mode = "calibrated"
