@@ -411,10 +411,10 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
 
       const proofRows = mission.proof.artifacts.slice(0, 6).map((artifact) => `
         <a class="proof-row" href="${{artifact.url}}" target="_blank" rel="noreferrer">
-          <div>
+          <div class="proof-row-head">
             <strong>${{artifact.id}}</strong>
-            <span>${{artifact.status}} | ${{(artifact.size / 1024).toFixed(1)}} KB | sha ${{artifact.sha}}</span>
           </div>
+          <span>${{artifact.status}} | ${{(artifact.size / 1024).toFixed(1)}} KB | sha ${{artifact.sha}}</span>
           <p>${{artifact.role}}</p>
         </a>
       `).join("") || `<div class="empty">No source manifest bundled.</div>`;
@@ -590,11 +590,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             filter: drop-shadow(0 0 8px rgba(15, 23, 42, 0.25));
           }}
           .event-marker text {{
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             paint-order: stroke;
             stroke: #f8fafc;
-            stroke-width: 4px;
+            stroke-width: 5px;
             fill: #17202a;
           }}
           .robot {{
@@ -751,6 +751,8 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             background: #f8fafc;
             padding: 12px;
             margin-top: 14px;
+            max-width: 100%;
+            overflow: hidden;
           }}
           .proof-fact {{
             color: #263445;
@@ -764,25 +766,40 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             color: inherit;
             border-top: 1px solid #e5edf2;
             padding: 9px 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
           }}
-          .proof-row div {{
+          .proof-row-head {{
             display: flex;
-            justify-content: space-between;
+            align-items: baseline;
+            justify-content: flex-start;
             gap: 8px;
+            min-width: 0;
           }}
           .proof-row strong {{
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
             font-size: 13px;
           }}
           .proof-row span {{
+            display: block;
+            margin-top: 3px;
+            max-width: 100%;
             color: #526274;
             font-size: 12px;
-            white-space: nowrap;
+            white-space: normal;
+            overflow-wrap: anywhere;
           }}
           .proof-row p {{
             margin: 4px 0 0;
             color: #263445;
             font-size: 13px;
             line-height: 1.35;
+            max-width: 100%;
+            overflow-wrap: anywhere;
           }}
           .modal-backdrop {{
             position: fixed;
