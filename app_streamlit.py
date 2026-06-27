@@ -110,16 +110,22 @@ def prepare_events(events: pd.DataFrame) -> List[Dict]:
     return prepared
 
 
-def prepare_robot_state(robot_state: pd.DataFrame, acoustic: pd.DataFrame, reel: pd.DataFrame) -> List[Dict]:
+def prepare_robot_state(robot_state: pd.DataFrame,
+                        acoustic: pd.DataFrame,
+                        reel: pd.DataFrame,
+                        imu: pd.DataFrame) -> List[Dict]:
     acoustic_sorted = acoustic.sort_values("window_start_s")
     reel_sorted = reel.sort_values("time_s")
+    imu_sorted = imu.sort_values("time_s")
     rows = []
     for _, state in robot_state.sort_values("time_s").iterrows():
         time_s = float(state["time_s"])
         acoustic_index = (acoustic_sorted["window_start_s"] - time_s).abs().idxmin()
         reel_index = (reel_sorted["time_s"] - time_s).abs().idxmin()
+        imu_index = (imu_sorted["time_s"] - time_s).abs().idxmin()
         acoustic_row = acoustic_sorted.loc[acoustic_index]
         reel_row = reel_sorted.loc[reel_index]
+        imu_row = imu_sorted.loc[imu_index]
         rows.append(
             {
                 "time": time_s,
@@ -131,7 +137,15 @@ def prepare_robot_state(robot_state: pd.DataFrame, acoustic: pd.DataFrame, reel:
                 "flow": float(state["flow_velocity_mps"]),
                 "speed": float(state["speed_mps"]),
                 "leakScore": float(acoustic_row["leak_score"]),
+                "rms": float(acoustic_row["rms"]),
+                "highBand": float(acoustic_row["bandpower_2000_10000"]),
+                "centroid": float(acoustic_row["spectral_centroid_hz"]),
                 "tension": float(reel_row["tether_tension_N"]),
+                "payoutSpeed": float(reel_row["payout_speed_mps"]),
+                "accelMag": float(imu_row["accel_mag"]),
+                "gyroMag": float(imu_row["gyro_mag"]),
+                "gyroZ": float(imu_row["gz_radps"]),
+                "jerk": float(imu_row["jerk"]),
             }
         )
     return rows
@@ -241,10 +255,11 @@ def prepare_proof(source_manifest: Dict) -> Dict:
 
 
 def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataFrame,
-                    reel: pd.DataFrame, events: pd.DataFrame, source_manifest: Dict) -> str:
+                    reel: pd.DataFrame, imu: pd.DataFrame, events: pd.DataFrame,
+                    source_manifest: Dict) -> str:
     pipes = prepare_network(network)
     prepared_events = prepare_events(events)
-    prepared_state = prepare_robot_state(robot_state, acoustic, reel)
+    prepared_state = prepare_robot_state(robot_state, acoustic, reel, imu)
     prepared_proof = prepare_proof(source_manifest)
     max_distance = float(robot_state["distance_m"].max())
 
@@ -650,6 +665,36 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             font-size: 19px;
             font-weight: 820;
           }}
+          .evidence-card {{
+            border: 1px solid #dbe3ea;
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 12px;
+            margin: 0 0 14px;
+          }}
+          .evidence-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 9px;
+          }}
+          .evidence-item {{
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 8px;
+          }}
+          .evidence-item div:first-child {{
+            color: #526274;
+            font-size: 11px;
+            font-weight: 800;
+          }}
+          .evidence-item div:last-child {{
+            margin-top: 3px;
+            color: #111827;
+            font-size: 15px;
+            font-weight: 820;
+          }}
           .progress-wrap {{
             margin: 8px 0 16px;
           }}
@@ -912,6 +957,24 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
                 <div class="metric"><div>Pressure</div><div>${{row.pressure.toFixed(2)}} bar</div></div>
                 <div class="metric"><div>Flow</div><div>${{row.flow.toFixed(2)}} m/s</div></div>
               </div>
+              <div class="evidence-card">
+                <div class="mode-label">Live IMU evidence</div>
+                <div class="evidence-grid">
+                  <div class="evidence-item"><div>gyro_z</div><div>${{row.gyroZ.toFixed(3)}} rad/s</div></div>
+                  <div class="evidence-item"><div>gyro_mag</div><div>${{row.gyroMag.toFixed(3)}} rad/s</div></div>
+                  <div class="evidence-item"><div>accel_mag</div><div>${{row.accelMag.toFixed(2)}} m/s2</div></div>
+                  <div class="evidence-item"><div>jerk</div><div>${{row.jerk.toFixed(1)}} m/s3</div></div>
+                </div>
+              </div>
+              <div class="evidence-card">
+                <div class="mode-label">Live acoustic / reel evidence</div>
+                <div class="evidence-grid">
+                  <div class="evidence-item"><div>RMS</div><div>${{row.rms.toFixed(3)}}</div></div>
+                  <div class="evidence-item"><div>high band</div><div>${{row.highBand.toExponential(2)}}</div></div>
+                  <div class="evidence-item"><div>centroid</div><div>${{Math.round(row.centroid)}} Hz</div></div>
+                  <div class="evidence-item"><div>payout speed</div><div>${{row.payoutSpeed.toFixed(2)}} m/s</div></div>
+                </div>
+              </div>
               <div class="progress-wrap">
                 <div class="progress-label"><span>Route progress</span><span>${{Math.round(progress * 100)}}%</span></div>
                 <div class="progress-bar"><div class="progress-fill"></div></div>
@@ -1055,6 +1118,7 @@ def main() -> None:
     metadata = load_json(str(mission_path("metadata.json")))
     network = load_json(str(mission_path("network.geojson")))
     robot_state = load_csv(str(mission_path("robot_state.csv")))
+    imu = load_csv(str(mission_path("imu.csv")))
     reel = load_csv(str(mission_path("reel.csv")))
     acoustic = load_csv(str(mission_path("acoustic_features.csv")))
     events = load_csv(str(mission_path("events.csv")))
@@ -1077,7 +1141,7 @@ def main() -> None:
     st.markdown(f'<div class="intro">{intro}</div>', unsafe_allow_html=True)
 
     components.html(
-        simulation_html(network, robot_state, acoustic, reel, events, source_manifest),
+        simulation_html(network, robot_state, acoustic, reel, imu, events, source_manifest),
         height=980,
         scrolling=False,
     )
