@@ -354,6 +354,27 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
       }}).join(" ");
     }}
 
+    function eventLabelPlacement(event) {{
+      const placements = {{
+        E001: {{ dx: 18, dy: -24, anchor: "start" }},
+        E002: {{ dx: 26, dy: -38, anchor: "start" }},
+        E003: {{ dx: 26, dy: -30, anchor: "start" }},
+        E004: {{ dx: 18, dy: -20, anchor: "start" }},
+        E005: {{ dx: 28, dy: 28, anchor: "start" }},
+        E006: {{ dx: -26, dy: -14, anchor: "end" }},
+      }};
+      const placement = placements[event.id] || {{ dx: 18, dy: -20, anchor: "start" }};
+      const markerX = sx(event.x);
+      const markerY = sy(event.y);
+      return {{
+        markerX,
+        markerY,
+        labelX: markerX + placement.dx,
+        labelY: markerY + placement.dy,
+        anchor: placement.anchor,
+      }};
+    }}
+
     function render() {{
       const row = currentState();
       const distance = row.distance;
@@ -382,11 +403,15 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
 
       const eventMarkers = mission.events.map((event) => {{
         const isReached = event.distance <= distance;
+        const label = eventLabelPlacement(event);
         return `
           <g class="event-marker ${{isReached ? "reached" : ""}}">
-            <circle cx="${{sx(event.x)}}" cy="${{sy(event.y)}}" r="${{isReached ? 12 : 8}}"
+            <line class="event-callout"
+                  x1="${{label.markerX}}" y1="${{label.markerY}}"
+                  x2="${{label.labelX}}" y2="${{label.labelY - 5}}"></line>
+            <circle cx="${{label.markerX}}" cy="${{label.markerY}}" r="${{isReached ? 12 : 8}}"
                     fill="${{event.color}}"></circle>
-            <text x="${{sx(event.x) + 14}}" y="${{sy(event.y) - 12}}">${{event.label}}</text>
+            <text x="${{label.labelX}}" y="${{label.labelY}}" text-anchor="${{label.anchor}}">${{event.label}}</text>
           </g>
         `;
       }}).join("");
@@ -585,6 +610,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             stroke: white;
             stroke-width: 2;
           }}
+          .event-callout {{
+            stroke: rgba(15, 23, 42, 0.46);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+          }}
           .event-marker.reached circle {{
             opacity: 1;
             filter: drop-shadow(0 0 8px rgba(15, 23, 42, 0.25));
@@ -594,7 +624,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             font-weight: 800;
             paint-order: stroke;
             stroke: #f8fafc;
-            stroke-width: 5px;
+            stroke-width: 6px;
             fill: #17202a;
           }}
           .robot {{
