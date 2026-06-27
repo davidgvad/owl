@@ -54,6 +54,24 @@ python3 scripts/validate_mission.py data/calibrated_mission
 
 It creates a modeled pipe route with intersections, robot motion, IMU vibration/turn events, tether payout/tension, hydrophone audio calibrated from public acoustic patterns, acoustic features, and fused event cards.
 
+## Run From Real PipeOwl Logs
+
+Once hardware or a bench test loop records real logs, import the raw folder:
+
+```sh
+python3 scripts/import_hardware_mission.py \
+  --raw data/raw_missions/bench_test_001 \
+  --out data/real_mission
+```
+
+Then run the same dashboard on the imported real mission:
+
+```sh
+PIPEOWL_MISSION_DIR=data/real_mission ./run_local.sh
+```
+
+The raw folder must contain `imu.csv`, `reel.csv`, and `hydrophone.wav`. See `docs/hardware_log_format.md` for the exact columns. The importer writes a `source_manifest.json` with SHA-256 hashes for the raw files, so the app can prove it is running from a specific local PipeOwl recording.
+
 ## Source Proof Bundle
 
 The repo includes small, auditable public-source artifacts under `data/source_artifacts/`.
@@ -136,9 +154,11 @@ Run the robot controller simulator:
 - `pipeowl/features.py`: IMU and acoustic feature extraction
 - `pipeowl/calibration_profiles.py`: public dataset calibration source and pattern assumptions
 - `pipeowl/provenance.py`: source artifact hashes, evidence summary, and proof manifest writer
+- `pipeowl/hardware_importer.py`: imports real PipeOwl hardware/test-loop logs into the mission format
 - `pipeowl/mission_builder.py`: deterministic dataset-calibrated replay generator
 - `pipeowl/adapters/`: public dataset adapter skeletons
 - `scripts/fetch_source_proof.py`: downloads public proof artifacts and writes `source_manifest.json`
+- `scripts/import_hardware_mission.py`: converts raw hardware logs into `data/real_mission`
 - `scripts/generate_calibrated_mission.py`: creates `data/calibrated_mission`
 - `app_streamlit.py`: mission replay dashboard
 - `include/`, `src/`: C++ robot controller prototype
