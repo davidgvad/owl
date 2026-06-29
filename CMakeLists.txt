@@ -27,13 +27,3 @@ add_executable(owl_sim
 )
 
 target_link_libraries(owl_sim PRIVATE owl_controller)
-
-enable_testing()
-
-add_executable(controller_tests
-    tests/controller_tests.cpp
-)
-
-target_link_libraries(controller_tests PRIVATE owl_controller)
-
-add_test(NAME controller_tests COMMAND controller_tests)

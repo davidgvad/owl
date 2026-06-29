@@ -161,7 +161,6 @@ def prepare_robot_state(robot_state: pd.DataFrame,
 
 def prepare_proof(source_manifest: Dict) -> Dict:
     summary = source_manifest.get("evidence_summary", {})
-    hardware = summary.get("hardware", {})
     gpla = summary.get("gpla12", {})
     subpipe = summary.get("subpipe", {})
     wntr = summary.get("wntr", {})
@@ -181,81 +180,41 @@ def prepare_proof(source_manifest: Dict) -> Dict:
             }
         )
 
-    if hardware:
-        hydrophone = hardware.get("hydrophone", {})
-        summary_rows = [
-            f"Hardware IMU rows: {hardware.get('imu_rows', 0)}",
-            f"Hardware reel rows: {hardware.get('reel_rows', 0)}",
-            f"Hydrophone: {hydrophone.get('duration_s', 0):.1f} s at {hydrophone.get('sample_rate_hz', 0)} Hz",
-            f"Acoustic windows analyzed: {hardware.get('acoustic_windows', 0)}",
-        ]
-        modal = {
-            "title": "Why this is real PipeOwl data",
-            "lede": (
-                "This mission was imported from local PipeOwl hardware/test-loop logs. "
-                "The raw IMU, reel, hydrophone, and optional geometry files are hashed in source_manifest.json."
-            ),
-            "realItems": [
-                "The IMU stream comes from a recorded imu.csv file.",
-                "The tether/reel stream comes from a recorded reel.csv file.",
-                "The hydrophone stream comes from a recorded hydrophone.wav file.",
-                "Every raw input file has a local path, file size, and SHA-256 hash.",
-            ],
-            "mappingItems": [
-                "Reel distance maps time to distance through the pipe.",
-                "IMU samples are synchronized to reel distance and expanded with acceleration magnitude, gyro magnitude, and jerk.",
-                "Hydrophone audio is windowed into RMS, peak, bandpower, spectral centroid, and leak score.",
-                "If no surveyed network.geojson is supplied, the importer uses a straight test-pipe route.",
-            ],
-            "fusionText": (
-                "A possible leak needs high hydrophone leak score and no matching IMU impact or tether artifact. "
-                "Possible impacts and bends come directly from IMU/reel features in the imported recording."
-            ),
-            "boundaryText": (
-                "This proves the dashboard can run from real PipeOwl logs. Real leak accuracy still needs controlled "
-                "ground truth, like a known leak position in a test loop."
-            ),
-        }
-        mode = "hardware"
-    else:
-        summary_rows = [
-            f"GPLA-12 acoustic rows: {gpla.get('data_rows', 0)} x {gpla.get('samples_per_row', 0)}",
-            f"GPLA-12 label rows: {gpla.get('label_rows', 0)}",
-            f"SubPipe archive metadata: {len(subpipe.get('zenodo_archives', []))} public files indexed",
-            f"WNTR Net3 network: {wntr.get('net3_junction_rows', 0)} junctions, {wntr.get('net3_pipe_rows', 0)} pipes",
-        ]
-        modal = {
-            "title": "Why this demo is dataset-backed",
-            "lede": (
-                "This demo is constructed from prerecorded public source artifacts and a repeatable replay layer. "
-                "The source URLs, local file sizes, and SHA-256 hashes are recorded in source_manifest.json."
-            ),
-            "realItems": [
-                "GPLA-12 supplies real public acoustic leakage rows and labels.",
-                "SubPipe and AQUALOC support underwater robot IMU/pressure assumptions.",
-                "WNTR/EPANET supplies real water-network geometry and leak-scenario formats.",
-                "Every proof artifact has a source URL, local size, and SHA-256 hash.",
-            ],
-            "mappingItems": [
-                "GPLA-12 acoustic rows calibrate leak-like audio features: RMS, peak, bandpower, centroid, and leak score.",
-                "SubPipe and AQUALOC support underwater IMU behavior: steady vibration, gyro turns, pressure timing, and impact-like spikes.",
-                "WNTR/EPANET networks provide pipe graph logic: junctions, pipes, leak scenarios, and distance-to-location mapping.",
-                "The tether/reel model converts replay time into distance, then distance is mapped onto the pipe route.",
-            ],
-            "fusionText": (
-                "A leak event needs a high acoustic score plus pressure/flow context and no matching IMU impact or "
-                "tether jerk. An intersection comes from network geometry and is supported by an IMU turn pattern."
-            ),
-            "boundaryText": (
-                "The trustworthy claim is: prerecorded public/proxy datasets calibrate the acoustic, motion, and "
-                "pipe-network behavior used in this repeatable PipeOwl mission replay."
-            ),
-        }
-        mode = "calibrated"
+    summary_rows = [
+        f"GPLA-12 rows: {gpla.get('data_rows', 0)} x {gpla.get('samples_per_row', 0)}",
+        f"GPLA-12 labels: {gpla.get('label_rows', 0)}",
+        f"SubPipe files indexed: {len(subpipe.get('zenodo_archives', []))}",
+        f"WNTR Net3: {wntr.get('net3_junction_rows', 0)} junctions, {wntr.get('net3_pipe_rows', 0)} pipes",
+    ]
+    modal = {
+        "title": "Data sources used in this demo",
+        "lede": (
+            "This is a local replay built from public source files and a small modeled pipe route. "
+            "The source file hashes are saved in source_manifest.json."
+        ),
+        "realItems": [
+            "GPLA-12 gives acoustic leak examples.",
+            "SubPipe and AQUALOC are used as underwater robot motion references.",
+            "WNTR/EPANET gives the water-network file format and pipe graph idea.",
+            "The exact source files are stored under data/source_artifacts.",
+        ],
+        "mappingItems": [
+            "Audio is converted into RMS, bandpower, centroid, and leak score.",
+            "IMU values are converted into acceleration, gyro, and jerk readings.",
+            "The reel distance moves the robot along the pipe route.",
+            "Events are recorded when those values cross simple thresholds.",
+        ],
+        "fusionText": (
+            "For a leak, the demo looks for a high sound score, a pressure/flow change, "
+            "and no big impact or tether spike at the same time."
+        ),
+        "boundaryText": (
+            "This is still a simulation. Real accuracy needs our own robot logs from a test pipe."
+        ),
+    }
 
     return {
-        "mode": mode,
-        "honestClaim": source_manifest.get("honest_claim", "No source manifest bundled."),
+        "mode": "demo",
         "summary": summary_rows,
         "modal": modal,
         "artifacts": artifacts,
@@ -492,10 +451,10 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
 
       const proofModal = state.proofOpen ? `
         <div class="modal-backdrop">
-          <section class="proof-modal" role="dialog" aria-modal="true" aria-label="Data validity explanation">
+          <section class="proof-modal" role="dialog" aria-modal="true" aria-label="Data sources">
             <div class="modal-head">
               <div>
-                <div class="mode-label">Data validity</div>
+                <div class="mode-label">Data sources</div>
                 <h2>${{mission.proof.modal.title}}</h2>
               </div>
               <button id="closeProofBtn" class="icon-button">Close</button>
@@ -505,26 +464,26 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
             </p>
             <div class="proof-grid">
               <div class="proof-explain">
-                <h3>What is real</h3>
+                <h3>Source files</h3>
                 <ul>
                   ${{modalFacts}}
                   ${{realItems}}
                 </ul>
               </div>
               <div class="proof-explain">
-                <h3>How we map it</h3>
+                <h3>How the demo uses them</h3>
                 <ul>
                   ${{mappingItems}}
                 </ul>
               </div>
               <div class="proof-explain wide">
-                <h3>How detections are fused</h3>
+                <h3>Event logic</h3>
                 <p>
                   ${{mission.proof.modal.fusionText}}
                 </p>
               </div>
               <div class="proof-explain wide boundary">
-                <h3>Boundary of the claim</h3>
+                <h3>Current limit</h3>
                 <p>
                   ${{mission.proof.modal.boundaryText}}
                 </p>
@@ -1023,11 +982,11 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
         <div class="sim-shell">
           <div class="topbar">
             <div>
-              <div class="title">Dataset-calibrated mission replay</div>
+              <div class="title">PipeOwl pipe replay demo</div>
               <div class="subtitle">Press Start. The robot moves through the pipe and explains each detected pattern.</div>
             </div>
             <div class="controls">
-              <button id="proofBtn" class="secondary">Why trust data?</button>
+              <button id="proofBtn" class="secondary">Data sources</button>
               <button id="startBtn" class="primary" ${{state.playing ? "disabled" : ""}}>${{startLabel}}</button>
               <button id="pauseBtn" ${{state.playing ? "" : "disabled"}}>Pause</button>
               <button id="resetBtn">Reset</button>
@@ -1084,7 +1043,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
                 </div>
               </div>
               <div class="evidence-card">
-                <div class="mode-label">Live acoustic / reel evidence</div>
+                <div class="mode-label">Live hydrophone + tether</div>
                 <div class="evidence-grid">
                   <div class="evidence-item"><div>RMS</div><div>${{row.rms.toFixed(3)}}</div></div>
                   <div class="evidence-item"><div>high band</div><div>${{row.highBand.toExponential(2)}}</div></div>
@@ -1103,7 +1062,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
               <div class="mode-label">Reached data</div>
               ${{reachedRows}}
               <div class="proof-card">
-                <div class="mode-label">Proof bundle</div>
+                <div class="mode-label">Source files</div>
                 ${{proofFacts}}
                 ${{proofRows}}
               </div>
@@ -1189,7 +1148,7 @@ def simulation_html(network: Dict, robot_state: pd.DataFrame, acoustic: pd.DataF
 
 
 def main() -> None:
-    st.set_page_config(page_title="PipeOwl Dataset-Calibrated Replay", layout="wide")
+    st.set_page_config(page_title="PipeOwl Demo", layout="wide")
     st.markdown(
         """
         <style>
@@ -1237,7 +1196,6 @@ def main() -> None:
 
         build_calibrated_mission(MISSION_DIR)
 
-    metadata = load_json(str(mission_path("metadata.json")))
     network = load_json(str(mission_path("network.geojson")))
     robot_state = load_csv(str(mission_path("robot_state.csv")))
     imu = load_csv(str(mission_path("imu.csv")))
@@ -1246,18 +1204,10 @@ def main() -> None:
     events = load_csv(str(mission_path("events.csv")))
     source_manifest = load_optional_json(str(mission_path("source_manifest.json")))
 
-    if metadata.get("replay_mode") == "hardware_import":
-        title = "PipeOwl hardware mission replay"
-        intro = (
-            "Start the robot replay. This mission was imported from local PipeOwl IMU, reel, "
-            "and hydrophone logs, then converted into the canonical mission format."
-        )
-    else:
-        title = "PipeOwl dataset-calibrated pipe robot replay"
-        intro = (
-            "Start the robot. Sensor patterns are calibrated from public underwater robot and "
-            "acoustic datasets, then fused with a modeled pipe network."
-        )
+    title = "PipeOwl pipe robot demo"
+    intro = (
+        "Start the robot. The replay uses public dataset examples and a simple modeled pipe route."
+    )
 
     st.title(title)
     st.markdown(f'<div class="intro">{intro}</div>', unsafe_allow_html=True)

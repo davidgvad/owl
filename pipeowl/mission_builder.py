@@ -1,4 +1,4 @@
-"""Dataset-calibrated PipeOwl mission replay generation."""
+"""Build the PipeOwl demo mission."""
 
 from __future__ import annotations
 
@@ -78,26 +78,14 @@ def distance_to_time(distance_m: float, speed_mps: float = 0.70) -> float:
 def write_metadata(out_dir: Path) -> None:
     metadata = {
         "mission_id": "calibrated_001",
-        "mission_name": "PipeOwl Dataset-Calibrated Replay",
-        "replay_mode": "dataset_calibrated",
+        "mission_name": "PipeOwl Demo Mission",
+        "replay_mode": "demo",
         "data_sources": [source["source"] for source in CALIBRATION_SOURCES],
         "source_manifest": "source_manifest.json",
-        "source_proof_note": (
-            "See source_manifest.json for downloaded public artifacts, source URLs, "
-            "file sizes, and SHA-256 hashes used to support the calibration story."
-        ),
-        "calibration_sources": CALIBRATION_SOURCES,
-        "pattern_library": PATTERN_LIBRARY,
-        "provenance_note": (
-            "Dataset-calibrated replay: motion, IMU, hydrophone, pressure, and flow "
-            "behavior are calibrated from public underwater robot and acoustic datasets. "
-            "Pipe geometry, tether, and event placement are modeled until PipeOwl hardware "
-            "test-loop logs replace each stream."
-        ),
-        "mode_limitations": [
-            "Constructed from prerecorded public/proxy datasets and a repeatable replay route",
-            "No single public dataset contains hydrophone, IMU, tether, pipe intersections, and leak truth together",
-            "Intersections are identified by network geometry plus IMU turn patterns",
+        "note": "Local demo built from public dataset examples and a modeled pipe route.",
+        "limitations": [
+            "This is a simulation, not a real PipeOwl robot recording",
+            "Intersections come from the pipe route plus IMU turn behavior",
         ],
         "pipe": {
             "material": "PVC",
@@ -463,8 +451,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
             ),
             (
                 "known pipe graph node; IMU/heading support shown in characterizing parameters. "
-                f"Source: {PATTERN_LIBRARY['intersection']['source']}. "
-                "Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+                f"Source: {PATTERN_LIBRARY['intersection']['source']}."
             ),
         )
 
@@ -486,8 +473,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         ),
         (
             f"{PATTERN_LIBRARY['impact']['evidence']}. "
-            f"Source: {PATTERN_LIBRARY['impact']['source']}. "
-            "Proof IDs: SUBPIPE_README, SUBPIPE_ZENODO, AQUALOC_PAGE"
+            f"Source: {PATTERN_LIBRARY['impact']['source']}."
         ),
     )
 
@@ -526,8 +512,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
                 ),
                 (
                     f"{PATTERN_LIBRARY['leak']['evidence']}. "
-                    f"Source: {PATTERN_LIBRARY['leak']['source']}. "
-                    "Proof IDs: GPLA12_DATA_V1, GPLA12_LABELS_V1, WNTR_LEAKS_INP"
+                    f"Source: {PATTERN_LIBRARY['leak']['source']}."
                 ),
             )
             break
@@ -550,8 +535,7 @@ def create_events(robot_state_rows: Sequence[Mapping[str, object]],
         ),
         (
             f"{PATTERN_LIBRARY['intersection']['imu']}. "
-            f"Source: {PATTERN_LIBRARY['intersection']['source']}. "
-            "Proof IDs: WNTR_NET3_INP, SUBPIPE_README, AQUALOC_PAGE"
+            f"Source: {PATTERN_LIBRARY['intersection']['source']}."
         ),
     )
 

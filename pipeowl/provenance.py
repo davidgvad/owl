@@ -1,4 +1,4 @@
-"""Source-proof helpers for the PipeOwl calibrated replay."""
+"""Source-file summary helpers for the PipeOwl demo."""
 
 from __future__ import annotations
 
@@ -42,10 +42,10 @@ PROOF_ARTIFACTS: List[Dict[str, str]] = [
         "id": "GPLA12_LICENSE",
         "stream": "license",
         "title": "GPLA-12 repository license",
-        "role": "License proof for the bundled GPLA-12 source artifacts",
+        "role": "License file for the bundled GPLA-12 source artifacts",
         "source_url": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/LICENSE",
         "local_file": "gpla12_license.txt",
-        "claim_supported": "The proof bundle records licensing context for the acoustic proxy artifacts.",
+        "claim_supported": "Records licensing context for the acoustic source artifacts.",
     },
     {
         "id": "GPLA12_TREE",
@@ -72,16 +72,16 @@ PROOF_ARTIFACTS: List[Dict[str, str]] = [
         "role": "Official archive metadata and file sizes for the full SubPipe dataset",
         "source_url": "https://zenodo.org/api/records/10053564",
         "local_file": "subpipe_zenodo_record.json",
-        "claim_supported": "SubPipe raw archives exist publicly but are multi-GB, so this repo stores metadata proof instead of bundling the full dataset.",
+        "claim_supported": "SubPipe raw archives exist publicly but are multi-GB, so this repo stores metadata instead of the full dataset.",
     },
     {
         "id": "SUBPIPE_LICENSE",
         "stream": "license",
         "title": "SubPipe repository license",
-        "role": "License proof for the SubPipe source metadata artifact",
+        "role": "License file for the SubPipe source metadata artifact",
         "source_url": "https://raw.githubusercontent.com/remaro-network/SubPipe-dataset/main/LICENSE",
         "local_file": "subpipe_license.txt",
-        "claim_supported": "The proof bundle records licensing context for the SubPipe metadata artifact.",
+        "claim_supported": "Records licensing context for the SubPipe metadata artifact.",
     },
     {
         "id": "AQUALOC_PAGE",
@@ -90,7 +90,7 @@ PROOF_ARTIFACTS: List[Dict[str, str]] = [
         "role": "Underwater ROV IMU/pressure timing reference",
         "source_url": "https://www.lirmm.fr/aqualoc/",
         "local_file": "aqualoc_page.html",
-        "claim_supported": "AQUALOC supports the underwater IMU and pressure-timestamping assumptions used by the replay framework.",
+        "claim_supported": "AQUALOC supports the underwater IMU and pressure-timestamping assumptions used by the replay.",
     },
     {
         "id": "OCEANSHIP_ARXIV",
@@ -114,7 +114,7 @@ PROOF_ARTIFACTS: List[Dict[str, str]] = [
         "id": "WNTR_NET3_INP",
         "stream": "pipe_network",
         "title": "WNTR Net3 EPANET network",
-        "role": "Real EPANET input file proving the network/intersection data format",
+        "role": "Real EPANET input file showing the network/intersection data format",
         "source_url": "https://raw.githubusercontent.com/USEPA/WNTR/main/examples/networks/Net3.inp",
         "local_file": "wntr_net3.inp",
         "claim_supported": "The replay route is shaped like a water-network graph and can map distance to nodes/intersections using EPANET-style data.",
@@ -132,10 +132,10 @@ PROOF_ARTIFACTS: List[Dict[str, str]] = [
         "id": "WNTR_LICENSE",
         "stream": "license",
         "title": "WNTR repository license",
-        "role": "License proof for bundled WNTR source artifacts",
+        "role": "License file for bundled WNTR source artifacts",
         "source_url": "https://raw.githubusercontent.com/USEPA/WNTR/main/LICENSE.md",
         "local_file": "wntr_license.txt",
-        "claim_supported": "The proof bundle records licensing context for WNTR/EPANET artifacts.",
+        "claim_supported": "Records licensing context for WNTR/EPANET artifacts.",
     },
     {
         "id": "WNTR_TREE",
@@ -278,7 +278,7 @@ def build_source_manifest(artifact_dir: Path) -> Dict[str, object]:
     records = [artifact_record(artifact_dir, spec) for spec in PROOF_ARTIFACTS]
     return {
         "manifest_version": "1.0",
-        "purpose": "Auditable source-proof bundle for the PipeOwl dataset-calibrated replay.",
+        "purpose": "Source file summary for the PipeOwl demo.",
         "honest_claim": (
             "The replay is constructed from prerecorded public/proxy datasets and real source artifacts. "
             "Those artifacts calibrate the acoustic, motion, and water-network behavior used by the demo."

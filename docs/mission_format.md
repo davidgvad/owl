@@ -1,6 +1,6 @@
 # PipeOwl Mission Format
 
-PipeOwl adapters must emit a mission directory instead of dataset-specific files. This keeps the replay, analytics, and reports stable while hardware and public datasets change.
+The demo uses one simple mission folder. The dashboard reads these files directly.
 
 ```text
 mission_001/

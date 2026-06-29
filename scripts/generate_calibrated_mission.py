@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the PipeOwl dataset-calibrated replay mission."""
+"""Generate the PipeOwl demo mission."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def main() -> int:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    print(f"Generated PipeOwl dataset-calibrated replay at {out_dir}")
+    print(f"Generated PipeOwl demo mission at {out_dir}")
     return 0
 
 

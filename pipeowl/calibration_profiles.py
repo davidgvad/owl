@@ -1,9 +1,4 @@
-"""Dataset-calibration profiles for PipeOwl replay generation.
-
-These profiles do not bundle the public datasets themselves. They encode the
-sensor-pattern assumptions we use until local copies of SubPipe, AQUALOC,
-GPLA-12, OceanShip, and WNTR/EPANET exports are connected through adapters.
-"""
+"""Dataset notes used by the PipeOwl replay generator."""
 
 from __future__ import annotations
 
