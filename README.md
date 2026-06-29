@@ -50,6 +50,9 @@ python3 scripts/validate_mission.py data/calibrated_mission
 - `data/source_artifacts/`: public dataset/source files used for calibration
 - `include/` and `src/`: small C++ controller prototype
 
+For the longer explanation of how the simulation was built from public dataset
+references, read `docs/simulation_report.md`.
+
 ## Mission Files
 
 The dashboard reads:
